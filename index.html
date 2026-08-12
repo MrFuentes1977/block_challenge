@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programación en Bloques: Plataforma Educativa</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- PANTALLA 1: PORTADA INICIAL -->
+    <div id="screen-home" class="screen active">
+        <header>
+            <h1>Programación en Bloques: Plataforma Educativa</h1>
+        </header>
+        <div class="main-wrapper" style="overflow-y:auto; display:block;">
+            <div class="home-container">
+                <div class="home-title">¡Bienvenidos al Desafío de Bloques!</div>
+                <div class="home-subtitle">Elige un curso para comenzar tu aventura de codificación</div>
+                
+                <div class="courses-grid">
+                    <div id="card-course-1" class="course-card unlocked" onclick="startCourse(1)">
+                        <div>
+                            <span class="course-badge b-unlocked">Habilitado</span>
+                            <h3>Curso 1: Primeros pasos</h3>
+                            <p>Aprende las nociones básicas de movimiento y bucles simples en espacios abiertos interactivos.</p>
+                        </div>
+                    </div>
+                    <div id="card-course-2" class="course-card locked" onclick="startCourse(2)">
+                        <div>
+                            <span id="badge-course-2" class="course-badge b-locked">Bloqueado</span>
+                            <h3>Curso 2: Laberintos</h3>
+                            <p>Supera obstáculos fijos y muros perimetrales desafiantes aplicando secuencias óptimas. (Requiere clave si saltas el Curso 1)</p>
+                        </div>
+                    </div>
+                    <div id="card-course-3" class="course-card locked" onclick="startCourse(3)">
+                        <div>
+                            <span id="badge-course-3" class="course-badge b-locked">Bloqueado</span>
+                            <h3>Curso 3: Bucles Anidados</h3>
+                            <p>Domina patrones complejos colocando bucles dentro de otros bucles. ¡Ahorra bloques y resuelve grandes desafíos!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: ENTORNO DEL JUEGO -->
+    <div id="screen-game" class="screen">
+        <header>
+            <div style="display:flex; align-items:center;">
+                <button class="btn-back-home" onclick="goBackToHome()">🏠 Inicio</button>
+                <h1 id="app-current-title">Programación en Bloques: Primeros pasos</h1>
+            </div>
+            <div class="header-widgets">
+                <div class="score-container" id="score-container">
+                    🏆 Puntuación: <span id="total-score">0</span> / 120 pts
+                </div>
+                <div class="progress-container">
+                    <span class="progress-label">Progreso:</span>
+                    <div class="progress-dots" id="progress-dots"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-wrapper">
+            <!-- COLUMNA 1: ESCENARIO Y GUÍA DUA -->
+            <div class="scenery-column">
+                <div id="dua-hint-banner" class="dua-hint-banner">
+                    <div class="dua-hint-title">💡 <span>Instrucciones</span></div>
+                    <div id="dua-hint-text">Cargando sugerencia...</div>
+                </div>
+
+                <div class="flat-grid" id="flat-grid"></div>
+                <div class="controls-row">
+                    <button class="btn btn-run" onclick="runProgram()">▶ ¡Ir!</button>
+                    <button class="btn btn-reset" onclick="resetLevelState()">↩ Reiniciar</button>
+                </div>
+            </div>
+
+            <!-- COLUMNA 2: BLOQUES CON SVG ACCESIBLES -->
+            <div class="toolbox-column" id="toolbox-column" ondragover="allowDropTrash(event)" ondragleave="dragLeaveTrash(event)" ondrop="dropTrash(event)">
+                <div class="column-header">Bloques</div>
+                <div class="toolbox-blocks">
+                    <div class="block-element move" draggable="true" ondragstart="dragFromToolbox(event, 'avanzar')">
+                        <span>avanzar</span>
+                        <svg class="block-icon" viewBox="0 0 100 100">
+                            <path d="M 10,32 H 55 V 15 L 90,50 L 55,85 V 68 H 10 Z" />
+                        </svg>
+                    </div>
+                    <div class="block-element turn-left" draggable="true" ondragstart="dragFromToolbox(event, 'izquierda')">
+                        <span>girar a la izquierda</span>
+                        <svg class="block-icon" viewBox="0 0 100 100">
+                            <path d="M 85,85 V 50 C 85,32 70,18 52,18 H 40 V 2 L 10,32 L 40,62 V 45 H 52 C 58,45 65,51 65,58 V 85 Z" />
+                        </svg>
+                    </div>
+                    <div class="block-element turn-right" draggable="true" ondragstart="dragFromToolbox(event, 'derecha')">
+                        <span>girar a la derecha</span>
+                        <svg class="block-icon" viewBox="0 0 100 100">
+                            <path d="M 15,85 V 50 C 15,32 30,18 48,18 H 60 V 2 L 90,32 L 60,62 V 45 H 48 C 42,45 35,51 35,58 V 85 Z" />
+                        </svg>
+                    </div>
+                    <div class="block-element loop-btn" draggable="true" ondragstart="dragFromToolbox(event, 'loop')">Repetir</div>
+                </div>
+            </div>
+
+            <!-- COLUMNA 3: ESPACIO DE TRABAJO -->
+            <div class="workspace-column">
+                <div class="workspace-header-container">
+                    <div class="workspace-title" id="workspace-title-count">Espacio de trabajo</div>
+                    <button class="btn-reestablecer" onclick="clearWorkspaceOnly()">
+                        <div class="btn-reestablecer-inner">Reestablecer</div>
+                    </button>
+                </div>
+                
+                <div class="workspace-area" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="dropToWorkspace(event, 'main', '')">
+                    <div class="start-block">🏁 Cuando se ejecuta</div>
+                    <div class="blocks-stack" id="blocks-stack"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: CERTIFICADO -->
+    <div id="screen-certificate" class="screen">
+        <header>
+            <h1>¡Curso Completado con Éxito!</h1>
+        </header>
+        <div class="main-wrapper" style="overflow-y:auto; display:block;">
+            <div class="cert-container">
+                <h2>🏆 ¡Felicidades!</h2>
+                <p>Has demostrado excelentes habilidades de pensamiento computacional.</p>
+                
+                <input type="text" id="student-name" class="input-name-field" placeholder="Escribe tu nombre completo aquí" oninput="drawCertificate()">
+                
+                <div style="margin: 20px 0; overflow-x: auto;">
+                    <canvas id="cert-canvas" width="650" height="450" style="border:1px solid #cbd5e1; background:#fff; max-width:100%;"></canvas>
+                </div>
+
+                <div class="cert-actions">
+                    <button class="btn-cert btn-cert-download" onclick="downloadCertificate()">📥 Descargar Diploma</button>
+                    <button class="btn-cert btn-cert-next" onclick="acceptCertificateAndContinue()">Aceptar y Continuar ➔</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES DUA Y CLAVE DE ACCESO -->
+    <div id="password-modal" class="dua-modal">
+        <div class="dua-modal-content error-border" style="border-top-color: #00b4c6;">
+            <div class="dua-modal-title" style="color: #00b4c6;">🔑 Acceso a Curso</div>
+            <div class="dua-modal-text">Introduce la clave de acceso para desbloquear este curso:</div>
+            <input type="password" id="course-password-input" class="input-name-field" style="width: 100%; text-align: center; font-size: 20px;" placeholder="••••" onkeydown="if(event.key==='Enter') confirmCoursePassword()">
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
+                <button class="btn-dua-close btn-dua-error-retry" style="background-color:#a6b1b9;" onclick="closePasswordModal()">Cancelar</button>
+                <button class="btn-dua-close" onclick="confirmCoursePassword()">Acceder ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dua-error-modal" class="dua-modal">
+        <div class="dua-modal-content error-border">
+            <div class="dua-modal-title title-amber">¡Vamos, tú puedes! 💪✨</div>
+            <div class="dua-modal-text" id="dua-error-message">Mensaje motivador...</div>
+            <button class="btn-dua-close btn-dua-error-retry" onclick="closeDuaModal()">Volver a intentar ↺</button>
+        </div>
+    </div>
+
+    <div id="dua-success-modal" class="dua-modal">
+        <div class="dua-modal-content success-border">
+            <div class="dua-modal-title title-green" id="dua-success-title">✨ ¡Nivel Superado! ✨</div>
+            <div class="dua-modal-text" id="dua-success-message">Mensaje motivador...</div>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button class="btn-dua-close btn-dua-error-retry" onclick="retryCurrentLevel()">Reintentar nivel ↺</button>
+                <button class="btn-dua-close btn-dua-success" onclick="closeSuccessModal()">¡Siguiente reto! ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Todos los derechos reservados. Página creada por Pedro Javier Fuentes Parada &copy2026
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
