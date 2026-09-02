@@ -4,32 +4,24 @@ const TOTAL_LEVELS = 12;
 let currentCourse = 1;
 let currentLevel = 1;
 let unlockedCourses = [1]; 
-let pendingCourseToUnlock = null;
 
-// SEGUIMIENTO DE NIVELES COMPLETADOS POR CADA CURSO
-let completedLevels = {
-    1: [],
-    2: [],
-    3: []
-};
-
-// LÍMITES DE BLOQUES POR RETO (SOLO APLICAN EN EL CURSO 3)
+// LÍMITES ESTIMADOS DE BLOQUES POR RETO (CURSO 3)
 const levelBlockLimits = {
-    1: 7,  // Reto 1
-    2: 7,  // Reto 2
-    3: 4,  // Reto 3
-    4: 14, // Reto 4
-    5: 4,  // Reto 5
-    6: 7,  // Reto 6
-    7: 5,  // Reto 7
-    8: 13, // Reto 8
-    9: 13, // Reto 9
-    10: 9, // Reto 10
-    11: 9, // Reto 11
-    12: 13 // Reto 12
+    1: 7,  // Reto 1: 7 bloques
+    2: 7,  // Reto 2: 7 bloques
+    3: 3,  // Reto 3: 3 bloques
+    4: 4,  // Reto 4: 4 bloques
+    5: 4,  // Reto 5: 4 bloques
+    6: 4,  // Reto 6: 4 bloques
+    7: 4,  // Reto 7: 4 bloques
+    8: 5,  // Reto 8: 5 bloques
+    9: 5,  // Reto 9: 5 bloques
+    10: 5, // Reto 10: 5 bloques
+    11: 5, // Reto 11: 5 bloques
+    12: 6  // Reto 12: 6 bloques
 };
 
-// SISTEMA DE PUNTUACIÓN (SOLO PARA EL CURSO 3)
+// SISTEMA DE PUNTUACIÓN (12 RETOS x 10 PTS MAX = 120 PTS MAX)
 let levelScores = {};
 
 function getLevelMaxBlocks() {
@@ -47,16 +39,10 @@ function calculateTotalScore() {
 }
 
 function updateScoreUI() {
-    const scoreContainer = document.getElementById('score-container');
-    if (currentCourse === 3) {
-        if (scoreContainer) scoreContainer.style.display = 'flex';
-        const total = calculateTotalScore();
-        const scoreEl = document.getElementById('total-score');
-        if (scoreEl) {
-            scoreEl.innerText = total;
-        }
-    } else {
-        if (scoreContainer) scoreContainer.style.display = 'none';
+    const total = calculateTotalScore();
+    const scoreEl = document.getElementById('total-score');
+    if (scoreEl) {
+        scoreEl.innerText = total;
     }
 }
 
@@ -71,68 +57,6 @@ const dirVectors = [
     { dx: -1, dy: 0 }, 
     { dx: 0, dy: -1 }  
 ];
-
-const motivationalSuccessMessages = [
-    "🎉 ¡Excelente trabajo! Has superado este nivel con dedicación y esfuerzo, sigue avanzando hacia nuevos retos.",
-    "🚀 ¡Felicitaciones! Tu constancia y habilidades te han llevado a completar este curso, el siguiente desafío te espera.",
-    "🌟 ¡Muy bien hecho! Cada paso que das te acerca más a convertirte en un gran programador.",
-    "🏆 ¡Lo lograste! Cada nivel superado demuestra tu esfuerzo y compromiso con el aprendizaje.",
-    "💡 ¡Gran avance! Tu curiosidad y dedicación te están llevando cada vez más lejos en el mundo de la programación."
-];
-
-const motivationalErrorMessages = [
-    "🌱 No pasa nada, cada intento te acerca más al éxito. ¡Sigue practicando y lo lograrás!",
-    "💪 El esfuerzo que haces hoy será tu fortaleza mañana. ¡Inténtalo de nuevo, tú puedes!",
-    "🔄 Equivocarse es parte del aprendizaje. Cada error es una oportunidad para mejorar.",
-    "✨ Recuerda: los grandes programadores también empezaron fallando. ¡Tu progreso está en marcha!",
-    "🚀 No te rindas, cada nivel es un reto que te prepara para el siguiente. ¡Vuelve a intentarlo!"
-];
-
-// EXPLICACIONES DUA PARA LOS NIVELES DEL CURSO 1, CURSO 2 Y CURSO 3
-const duaLevelHints = {
-    1: {
-        1: "<b>Paso 1: Orientación inicial.</b> Observa hacia dónde mira el robot y usa el bloque <b>avanzar</b> para dar el primer paso. Si necesitas cambiar de dirección, usa <b>girar a la derecha</b> o <b>girar a la izquierda</b> para alinearte con la casilla roja.",
-        2: "<b>Paso 2: Combinando giros y avance.</b> Para este reto, gira primero hacia la dirección correcta usando <b>girar a la derecha</b> o <b>girar a la izquierda</b>. Luego, arrastra los bloques <b>avanzar</b> necesarios hasta llegar al objetivo.",
-        3: "<b>Paso 3: Trayecto completo.</b> Planifica tu secuencia: avanza los pasos necesarios, gira a la izquierda o derecha según la esquina, y vuelve a avanzar. ¡Prueba combinar ambos giros con los pasos rectos!",
-        4: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        5: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        6: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        7: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        8: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        9: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        10: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        11: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
-        12: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!"
-    },
-    2: {
-        1: "Lleva al robot desde la casilla azul hasta la casilla roja siguiendo el camino correcto.",
-        2: "Tu tarea es guiar al personaje desde el punto azul hasta el punto rojo sin chocar con los obstáculos.",
-        3: "Programa los movimientos necesarios para que el robot llegue del inicio (azul) al destino (rojo).",
-        4: "Diseña la ruta que conecte azul con rojo usando los bloques de avanzar y girar.",
-        5: "Haz que el robot recorra el trayecto desde azul hasta rojo paso a paso.",
-        6: "Planifica la secuencia de comandos para mover al robot desde azul hasta rojo.",
-        7: "Tu misión: encontrar el camino más corto entre azul y rojo. ¡Usa tu lógica!",
-        8: "Indica los movimientos que permitirán al robot llegar del punto azul al punto rojo.",
-        9: "Construye el recorrido que lleve al robot desde la posición azul hasta la meta roja.",
-        10: "Guía al robot desde azul hasta rojo evitando los muros y tomando el camino correcto.",
-        11: "Crea la secuencia de instrucciones para que el robot avance desde azul hasta rojo sin errores.",
-        12: "El reto consiste en mover al robot del punto azul al punto rojo usando los bloques adecuados."
-    },
-    3: {
-        1: "El robot sigue un camino que se repite tres veces. Si escribimos todas las instrucciones sería muy largo, pero con un bucle lo hacemos más fácil: repetimos 3 veces y dentro ponemos los pasos rectos y los giros. Así el programa es más rápido de escribir y más sencillo de entender.",
-        2: "El camino del robot es una escalera. Cada escalón se forma con dos pasos: avanzar y girar. Como todos los escalones son iguales, podemos usar un bucle que repita esa acción varias veces. Así el programa es más corto y más fácil de entender.",
-        3: "El robot debe recorrer un cuadrado. Cada lado se hace avanzando varias veces y luego girando. Como los cuatro lados son iguales, usamos un bucle que se repite 4 veces. Dentro ponemos los pasos rectos y al final de cada lado el giro. Así el programa es más corto y más fácil de entender.",
-        4: "El camino del robot está formado por varios tramos rectos que se alternan con giros, creando el patrón en zigzag.<br>Cada tramo recto se recorre avanzando varias casillas seguidas. 👉 Para esto usamos un bucle interno que repite la acción de avanzar.<br>El zigzag completo se construye repitiendo esos tramos rectos seguidos de un giro. 👉 Para esto usamos un bucle externo, que repite la secuencia “avanzar + girar” tantas veces como idas y vueltas tenga el camino.",
-        5: "El robot debe recorrer una espiral. Cada tramo se hace avanzando varias veces y luego girando. Como el patrón se repite, usamos un bucle externo para los lados de la espiral y dentro un bucle interno para los pasos rectos. Así el programa se reduce a solo dos bucles y es mucho más fácil de entender.",
-        6: "La misión es construir la ruta que conduce hasta la meta final.",
-        7: "El propósito es diseñar el trayecto que conduce al punto de llegada.",
-        8: "La tarea busca elaborar la ruta que guía al robot hasta su destino.",
-        9: "El reto consiste en crear el recorrido que conecta el inicio con la llegada.",
-        10: "La tarea es organizar los pasos que guían al punto de llegada.",
-        11: "La finalidad es programar el camino correcto para alcanzar el objetivo.",
-        12: "El reto busca diseñar la secuencia de movimientos que llevan al destino final."
-    }
-};
 
 // MAPAS DEL CURSO 2: LABERINTOS
 const labyrinthMaps = {
@@ -262,7 +186,7 @@ const nestedLoopMaps = {
 ['M','M','M','M','M','M','M','M']] },
     2: { start: {x: 0, y: 6, dir: 0}, target: {x: 6, y: 0}, hints: [
         {x: 2, y: 6, symbol: '↺'},
-        {x: 2, y: 4, symbol: '↻'}
+        {x: 2, y: 4, symbol: '↺'}
     ], grid: [
 ['M','M','M','M','M','M','C','M'],
 ['M','M','M','M','M','M','C','M'],
@@ -272,21 +196,16 @@ const nestedLoopMaps = {
 ['M','M','C','M','M','M','M','M'],
 ['C','C','C','M','M','M','M','M'],
 ['M','M','M','M','M','M','M','M']] },
-    3: { start: {x: 1, y: 1, dir: 0}, target: {x: 1, y: 3}, hints: [
-        {x: 6, y: 1, symbol: '↻'}
-    ], grid: [
+    3: { start: {x: 1, y: 1, dir: 0}, target: {x: 1, y: 2}, grid: [
 ['M','M','M','M','M','M','M','M'],
-['M','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','C','M','M','M','M','C','M'],
-['M','C','M','M','M','M','C','M'],
-['M','C','M','M','M','M','C','M'],
-['M','C','C','C','C','C','C','M'],
+['M','C','C','C','C','C','M','M'],
+['M','C','M','M','M','C','M','M'],
+['M','C','M','M','M','C','M','M'],
+['M','C','M','M','M','C','M','M'],
+['M','C','C','C','C','C','M','M'],
+['M','M','M','M','M','M','M','M'],
 ['M','M','M','M','M','M','M','M']] },
-    4: { start: {x: 1, y: 1, dir: 0}, target: {x: 5, y: 5}, hints: [
-        {x: 5, y: 1, symbol: '↻'},
-        {x: 2, y: 3, symbol: '↺'}
-    ], grid: [
+    4: { start: {x: 1, y: 1, dir: 0}, target: {x: 5, y: 5}, grid: [
 ['M','M','M','M','M','M','M','M'],
 ['M','C','C','C','C','C','M','M'],
 ['M','M','M','M','M','C','M','M'],
@@ -295,26 +214,24 @@ const nestedLoopMaps = {
 ['M','M','C','C','C','C','M','M'],
 ['M','M','M','M','M','M','M','M'],
 ['M','M','M','M','M','M','M','M']] },
-    5: { start: {x: 0, y: 0, dir: 0}, target: {x: 0, y: 6}, hints: [
-        {x: 0, y: 6, symbol: '↻'}
-    ], grid: [
+    5: { start: {x: 0, y: 0, dir: 0}, target: {x: 3, y: 3}, grid: [
 ['C','C','C','C','C','C','C','M'],
 ['M','M','M','M','M','M','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','M','M','M','M','M','C','M'],
-['C','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','M','M']] },
-    6: { start: {x: 0, y: 7, dir: 0}, target: {x: 6, y: 1}, grid: [
+['M','C','C','C','C','M','C','M'],
+['M','C','M','C','C','M','C','M'],
+['M','C','M','M','M','M','C','M'],
+['M','C','C','C','C','C','C','M'],
 ['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M']] },
+    6: { start: {x: 0, y: 7, dir: 0}, target: {x: 7, y: 0}, grid: [
+['M','M','M','M','M','M','C','C'],
 ['M','M','M','M','C','C','C','M'],
 ['M','M','M','M','C','M','M','M'],
 ['M','M','C','C','C','M','M','M'],
 ['M','M','C','M','M','M','M','M'],
 ['C','C','C','M','M','M','M','M'],
 ['C','M','M','M','M','M','M','M'],
-['C','M','M','M','M','M','M','M']] },
+['C','C','M','M','M','M','M','M']] },
     7: { start: {x: 7, y: 7, dir: 2}, target: {x: 0, y: 0}, grid: [
 ['C','C','M','M','M','M','M','M'],
 ['M','C','C','M','M','M','M','M'],
@@ -324,8 +241,8 @@ const nestedLoopMaps = {
 ['M','M','M','M','M','C','C','M'],
 ['M','M','M','M','M','M','C','C'],
 ['M','M','M','M','M','M','M','C']] },
-    8: { start: {x: 1, y: 1, dir: 0}, target: {x: 6, y: 7}, grid: [
-['M','M','M','M','M','M','M','M'],
+    8: { start: {x: 1, y: 0, dir: 1}, target: {x: 6, y: 7}, grid: [
+['M','C','M','M','M','M','M','M'],
 ['M','C','C','C','C','C','C','M'],
 ['M','M','M','M','M','M','C','M'],
 ['M','C','C','C','C','C','C','M'],
@@ -333,42 +250,69 @@ const nestedLoopMaps = {
 ['M','C','C','C','C','C','C','M'],
 ['M','M','M','M','M','M','C','M'],
 ['M','M','M','M','M','M','C','M']] },
-    9: { start: {x: 0, y: 0, dir: 0}, target: {x: 0, y: 6}, grid: [
+    9: { start: {x: 0, y: 0, dir: 0}, target: {x: 4, y: 4}, grid: [
 ['C','C','C','C','C','C','C','C'],
 ['M','M','M','M','M','M','M','C'],
+['C','C','C','C','C','C','M','C'],
+['C','M','M','M','M','C','M','C'],
+['C','M','C','C','C','C','M','C'],
+['C','M','M','M','M','M','M','C'],
 ['C','C','C','C','C','C','C','C'],
-['C','M','M','M','M','M','M','M'],
-['C','C','C','C','C','C','C','C'],
+['M','M','M','M','M','M','M','M']] },
+    10: { start: {x: 0, y: 3, dir: 0}, target: {x: 7, y: 3}, grid: [
+['M','M','M','M','M','M','M','M'],
+['M','C','C','C','C','C','C','M'],
+['M','C','M','M','M','M','C','M'],
+['C','C','M','C','C','M','C','C'],
+['M','C','M','M','M','M','C','M'],
+['M','C','C','C','C','C','C','M'],
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M']] },
+    11: { start: {x: 7, y: 0, dir: 2}, target: {x: 0, y: 7}, grid: [
 ['M','M','M','M','M','M','M','C'],
+['M','C','C','C','C','C','C','C'],
+['M','C','M','M','M','M','M','M'],
+['M','C','C','C','C','C','C','M'],
+['M','M','M','M','M','M','C','M'],
+['M','C','C','C','C','C','C','M'],
+['M','C','M','M','M','M','M','M'],
+['C','C','M','M','M','M','M','M']] },
+    12: { start: {x: 0, y: 7, dir: 0}, target: {x: 7, y: 7}, grid: [
+['M','M','M','M','M','M','M','M'],
 ['C','C','C','C','C','C','C','C'],
-['M','M','M','M','M','M','M','M']] },
-    10: { start: {x: 0, y: 3, dir: 3}, target: {x: 7, y: 3}, grid: [
-['M','M','M','M','M','M','M','M'],
-['C','C','C','M','C','C','C','M'],
-['C','M','C','M','C','M','C','M'],
-['C','M','C','C','C','M','C','C'],
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M']] },
-    11: { start: {x: 0, y: 3, dir: 1}, target: {x: 7, y: 3}, grid: [
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M'],
-['C','M','C','C','C','M','C','C'],
-['C','M','C','M','C','M','C','M'],
-['C','C','C','M','C','C','C','M'],
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M']] },
-    12: { start: {x: 7, y: 7, dir: 3}, target: {x: 0, y: 7}, grid: [
-['M','C','C','C','M','C','C','C'],
-['M','C','M','C','M','C','M','C'],
-['M','C','M','C','M','C','M','C'],
-['M','C','M','C','M','C','M','C'],
-['M','C','M','C','M','C','M','C'],
-['M','C','M','C','M','C','M','C'],
-['M','C','M','C','M','C','M','C'],
-['C','C','M','C','C','C','M','C']] }
+['C','M','M','M','M','M','M','C'],
+['C','M','C','C','C','C','M','C'],
+['C','M','C','M','M','C','M','C'],
+['C','M','C','C','C','C','M','C'],
+['C','M','M','M','M','M','M','C'],
+['C','C','C','C','C','C','C','C']] }
+};
+
+const motivationalSuccessMessages = [
+    "🎉 ¡Excelente trabajo! Has superado este nivel con dedicación y esfuerzo, sigue avanzando hacia nuevos retos.",
+    "🚀 ¡Felicitaciones! Tu constancia y habilidades te han llevado a completar este curso, el siguiente desafío te espera.",
+    "🌟 ¡Muy bien hecho! Cada paso que das te acerca más a convertirte en un gran programador.",
+    "🏆 ¡Lo lograste! Cada nivel superado demuestra tu esfuerzo y compromiso con el aprendizaje.",
+    "💡 ¡Gran avance! Tu curiosidad y dedicación te están llevando cada vez más lejos en el mundo de la programación."
+];
+
+const motivationalErrorMessages = [
+    "🌱 No pasa nada, cada intento te acerca más al éxito. ¡Sigue practicando y lo lograrás!",
+    "💪 El esfuerzo que haces hoy será tu fortaleza mañana. ¡Inténtalo de nuevo, tú puedes!",
+    "🔄 Equivocarse es parte del aprendizaje. Cada error es una oportunidad para mejorar.",
+    "✨ Recuerda: los grandes programadores también empezaron fallando. ¡Tu progreso está en marcha!",
+    "🚀 No te rindas, cada nivel es un reto que te prepara para el siguiente. ¡Vuelve a intentarlo!"
+];
+
+// EXPLICACIONES DUA PARA LOS PRIMEROS NIVELES DEL CURSO 3
+const duaLevelHints = {
+    3: {
+        1: "El robot sigue un camino que se repite tres veces. Si escribimos todas las instrucciones sería muy largo, pero con un bucle lo hacemos más fácil: repetimos 3 veces y dentro ponemos los pasos rectos y los giros. Así el programa es más rápido de escribir y más sencillo de entender.",
+        2: "El camino del robot es una escalera. Cada escalón se forma con dos pasos: avanzar y girar. Como todos los escalones son iguales, podemos usar un bucle que repita esa acción varias veces. Así el programa es más corto y más fácil de entender.",
+        3: "<b>Cuadrado Perfecto:</b> Para recorrer los 4 lados de la figura, usa un bucle exterior de 4 repeticiones y dentro pon un bucle interno de avanzar.",
+        4: "<b>Líneas en Zigzag:</b> Descompón el movimiento en tramos. Usa un bucle interno para recorrer la recta y el externo para repetir las idas y vueltas.",
+        5: "<b>Patrón Espiral:</b> Un bucle dentro de otro te permite reducir un programa gigante a solo 2 bloques de Repetir anidados."
+    }
 };
 
 const tankSVG = `
@@ -380,11 +324,6 @@ const tankSVG = `
         <circle cx="45" cy="50" r="14" fill="#22c55e" stroke="#1e3a1e" stroke-width="4"/>
     </svg>
 `;
-
-// CADENAS SVG DE ÍCONOS ACCESIBLES
-const svgMove = `<svg class="block-icon" viewBox="0 0 100 100"><path d="M 10,32 H 55 V 15 L 90,50 L 55,85 V 68 H 10 Z" /></svg>`;
-const svgTurnLeft = `<svg class="block-icon" viewBox="0 0 100 100"><path d="M 85,85 V 50 C 85,32 70,18 52,18 H 40 V 2 L 10,32 L 40,62 V 45 H 52 C 58,45 65,51 65,58 V 85 Z" /></svg>`;
-const svgTurnRight = `<svg class="block-icon" viewBox="0 0 100 100"><path d="M 15,85 V 50 C 15,32 30,18 48,18 H 60 V 2 L 90,32 L 60,62 V 45 H 48 C 42,45 35,51 35,58 V 85 Z" /></svg>`;
 
 let workspaceItems = []; 
 let isExecuting = false;
@@ -443,11 +382,15 @@ function switchScreen(screenId) {
 
 function startCourse(courseNum) {
     if (courseNum > 1 && !unlockedCourses.includes(courseNum)) {
-        pendingCourseToUnlock = courseNum;
-        document.getElementById('course-password-input').value = '';
-        document.getElementById('password-modal').style.display = 'flex';
-        document.getElementById('course-password-input').focus();
-        return;
+        const pass = prompt(`🔑 Para acceder directamente al Curso ${courseNum} sin completar los anteriores, introduce la clave de acceso:`);
+        if (pass === "2846") {
+            if (!unlockedCourses.includes(courseNum)) unlockedCourses.push(courseNum);
+            updateHomeUI();
+            alert(`¡Acceso concedido! Curso ${courseNum} desbloqueado.`);
+        } else {
+            alert("Clave incorrecta. Debes completar primero los cursos previos o solicitar la clave al profesor.");
+            return;
+        }
     }
 
     currentCourse = courseNum;
@@ -462,25 +405,6 @@ function startCourse(courseNum) {
     switchScreen('screen-game');
     initProgressBar();
     generateLevelMap();
-}
-
-function closePasswordModal() {
-    document.getElementById('password-modal').style.display = 'none';
-    pendingCourseToUnlock = null;
-}
-
-function confirmCoursePassword() {
-    const pass = document.getElementById('course-password-input').value;
-    if (pass === "2846") {
-        const courseNum = pendingCourseToUnlock;
-        if (!unlockedCourses.includes(courseNum)) unlockedCourses.push(courseNum);
-        updateHomeUI();
-        closePasswordModal();
-        startCourse(courseNum);
-    } else {
-        alert("Clave incorrecta. Debes completar primero los cursos previos o solicitar la clave al profesor.");
-        document.getElementById('course-password-input').value = '';
-    }
 }
 
 function goBackToHome() {
@@ -529,8 +453,8 @@ function updateProgressBarUI() {
         const dot = document.getElementById(`dot-level-${i}`);
         if (!dot) continue;
         dot.classList.remove('active', 'completed');
-        if (completedLevels[currentCourse].includes(i)) dot.classList.add('completed');
-        if (i === currentLevel) dot.classList.add('active');
+        if (i < currentLevel) dot.classList.add('completed');
+        else if (i === currentLevel) dot.classList.add('active');
     }
 }
 
@@ -630,22 +554,6 @@ function updateBotVisual() {
     }
 }
 
-function showCrashWarning(x, y) {
-    const cell = document.getElementById(`cell-${y}-${x}`);
-    if (cell) {
-        const warningEl = document.createElement('div');
-        warningEl.className = 'cell-crash-warning';
-        warningEl.innerText = '⚠️';
-        cell.appendChild(warningEl);
-
-        setTimeout(() => {
-            if (warningEl.parentNode) {
-                warningEl.parentNode.removeChild(warningEl);
-            }
-        }, 700);
-    }
-}
-
 function dragFromToolbox(ev, blockType) {
     if (isExecuting) { ev.preventDefault(); return; }
     ev.dataTransfer.setData("text/plain", blockType);
@@ -712,6 +620,141 @@ function dropTrash(ev) {
     }
 }
 
+let touchDragData = null;
+let ghostEl = null;
+
+function initTouchDragSupport() {
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd, { passive: false });
+}
+
+function handleTouchStart(e) {
+    if (isExecuting) return;
+    const block = e.target.closest('.block-element, .loop-container-block');
+    if (!block) return;
+
+    if (e.target.tagName === 'SELECT') return;
+
+    const isToolbox = !!block.closest('.toolbox-column');
+    const isWorkspace = !!block.closest('.workspace-column');
+
+    if (!isToolbox && !isWorkspace) return;
+
+    const touch = e.touches[0];
+    
+    let source = isToolbox ? 'toolbox' : 'workspace';
+    let blockType = block.getAttribute('data-type');
+    let pathStr = block.getAttribute('data-path');
+
+    if (isToolbox && !blockType) {
+        if (block.classList.contains('move')) blockType = 'avanzar';
+        else if (block.classList.contains('turn-left')) blockType = 'izquierda';
+        else if (block.classList.contains('turn-right')) blockType = 'derecha';
+        else if (block.classList.contains('loop-btn')) blockType = 'loop';
+    }
+
+    touchDragData = {
+        source: source,
+        blockType: blockType,
+        pathStr: pathStr,
+        startX: touch.clientX,
+        startY: touch.clientY,
+        blockEl: block
+    };
+
+    ghostEl = block.cloneNode(true);
+    ghostEl.classList.add('touch-drag-ghost');
+    ghostEl.style.width = block.offsetWidth + 'px';
+    ghostEl.style.left = (touch.clientX - block.offsetWidth / 2) + 'px';
+    ghostEl.style.top = (touch.clientY - block.offsetHeight / 2) + 'px';
+    document.body.appendChild(ghostEl);
+}
+
+function handleTouchMove(e) {
+    if (!touchDragData || !ghostEl) return;
+    e.preventDefault(); 
+    
+    const touch = e.touches[0];
+    ghostEl.style.left = (touch.clientX - ghostEl.offsetWidth / 2) + 'px';
+    ghostEl.style.top = (touch.clientY - ghostEl.offsetHeight / 2) + 'px';
+
+    const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    document.querySelectorAll('.drag-over, .trash-can-active').forEach(el => {
+        el.classList.remove('drag-over', 'trash-can-active');
+    });
+
+    if (elementUnder) {
+        const targetSlot = elementUnder.closest('.loop-body-slots, .workspace-area');
+        if (targetSlot) {
+            targetSlot.classList.add('drag-over');
+        }
+        const trashArea = elementUnder.closest('.toolbox-column');
+        if (trashArea && touchDragData.source === 'workspace') {
+            trashArea.classList.add('trash-can-active');
+        }
+    }
+}
+
+function handleTouchEnd(e) {
+    if (!touchDragData || !ghostEl) return;
+
+    const touch = e.changedTouches[0];
+    const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    document.querySelectorAll('.drag-over, .trash-can-active').forEach(el => {
+        el.classList.remove('drag-over', 'trash-can-active');
+    });
+
+    if (elementUnder) {
+        const trashArea = elementUnder.closest('.toolbox-column');
+        const targetSlot = elementUnder.closest('.loop-body-slots, .workspace-area');
+
+        if (trashArea && touchDragData.source === 'workspace') {
+            const srcPath = parsePath(touchDragData.pathStr);
+            if (srcPath && srcPath.length > 0) {
+                removeItemByPath(workspaceItems, srcPath);
+                renderWorkspace();
+            }
+        } else if (targetSlot) {
+            let slotPathStr = '';
+            if (targetSlot.classList.contains('loop-body-slots')) {
+                const parentLoop = targetSlot.closest('.loop-container-block');
+                if (parentLoop) {
+                    slotPathStr = parentLoop.getAttribute('data-path') || '';
+                }
+            }
+
+            const slotPath = parsePath(slotPathStr);
+            const targetList = getTargetListByPath(workspaceItems, slotPath);
+
+            if (touchDragData.source === 'toolbox') {
+                if (touchDragData.blockType === 'loop') {
+                    targetList.push({ type: 'loop', iterations: 2, innerBlocks: [] });
+                } else if (touchDragData.blockType) {
+                    targetList.push({ type: 'single', action: touchDragData.blockType });
+                }
+            } else if (touchDragData.source === 'workspace') {
+                const srcPath = parsePath(touchDragData.pathStr);
+                if (srcPath && srcPath.length > 0 && !isDescendantPath(srcPath, slotPath)) {
+                    const movedItem = removeItemByPath(workspaceItems, srcPath);
+                    if (movedItem) {
+                        targetList.push(movedItem);
+                    }
+                }
+            }
+            renderWorkspace();
+        }
+    }
+
+    if (ghostEl && ghostEl.parentNode) {
+        ghostEl.parentNode.removeChild(ghostEl);
+    }
+    ghostEl = null;
+    touchDragData = null;
+}
+
 function changeIterations(pathStr, val) {
     const path = parsePath(pathStr);
     const item = getItemByPath(workspaceItems, path);
@@ -732,17 +775,16 @@ function countTotalBlocks(blocks = workspaceItems) {
 }
 
 function updateBlockCountDisplay() {
+    const total = countTotalBlocks(workspaceItems);
+    const limit = getLevelMaxBlocks();
     const titleEl = document.getElementById('workspace-title-count');
-    if (!titleEl) return;
-
-    if (currentCourse === 3) {
-        const total = countTotalBlocks(workspaceItems);
-        const limit = getLevelMaxBlocks();
+    if (titleEl) {
         titleEl.innerText = `Espacio de trabajo: ${total} / ${limit} bloques estimados`;
-        titleEl.style.color = (total > limit) ? '#fca5a5' : '#ffffff';
-    } else {
-        titleEl.innerText = `Espacio de trabajo`;
-        titleEl.style.color = '#ffffff';
+        if (total > limit) {
+            titleEl.style.color = '#fca5a5';
+        } else {
+            titleEl.style.color = '#ffffff';
+        }
     }
 }
 
@@ -769,9 +811,9 @@ function renderBlockTree(container, blocks, parentPath = []) {
             block.setAttribute('data-path', pathStr);
             block.ondragstart = (e) => dragFromWorkspace(e, pathStr);
             
-            if (item.action === 'avanzar') block.innerHTML = `<span>avanzar</span>${svgMove}`;
-            else if (item.action === 'izquierda') block.innerHTML = `<span>girar a la izquierda</span>${svgTurnLeft}`;
-            else block.innerHTML = `<span>girar a la derecha</span>${svgTurnRight}`;
+            if (item.action === 'avanzar') block.innerHTML = `<span>avanzar</span><span class="arrow-icon">→</span>`;
+            else if (item.action === 'izquierda') block.innerHTML = `<span>girar a la izquierda</span><span class="turn-icon">↺</span>`;
+            else block.innerHTML = `<span>girar a la derecha</span><span class="turn-icon">↻</span>`;
             
             container.appendChild(block);
         } else if (item.type === 'loop') {
@@ -853,41 +895,29 @@ function closeDuaModal() {
 
 function triggerDuaSuccess() {
     isExecuting = false;
-    
-    // REGISTRAR EL NIVEL COMO COMPLETADO
-    if (!completedLevels[currentCourse].includes(currentLevel)) {
-        completedLevels[currentCourse].push(currentLevel);
-    }
-
+    const totalBlocks = countTotalBlocks(workspaceItems);
+    const maxLimit = getLevelMaxBlocks();
     const titleEl = document.getElementById('dua-success-title');
     const textEl = document.getElementById('dua-success-message');
-    const randomIndex = Math.floor(Math.random() * motivationalSuccessMessages.length);
-    const selectedMsg = motivationalSuccessMessages[randomIndex];
 
-    if (currentCourse === 3) {
-        const totalBlocks = countTotalBlocks(workspaceItems);
-        const maxLimit = getLevelMaxBlocks();
-
-        if (totalBlocks > maxLimit) {
-            levelScores[currentLevel] = 7;
-            if (titleEl) titleEl.innerText = "⚡ Reto Completado";
-            if (textEl) {
-                textEl.innerHTML = `<b>¡Buen trabajo! Sin embargo, puedes mejorar, ya que este reto puede resolverse con menos bloques.</b><br><br>` +
-                    `<span style="font-size:14px; color:#64748b;">Usaste <b>${totalBlocks}</b> bloques (límite recomendado: <b>${maxLimit}</b>).<br>` +
-                    `Puntuación de este intento: <b>+7 puntos</b>. ¡Reinténtalo para ganar +10 pts!</span>`;
-            }
-        } else {
-            levelScores[currentLevel] = 10;
-            if (titleEl) titleEl.innerText = "✨ ¡Nivel Superado con Éxito! ✨";
-            if (textEl) {
-                textEl.innerHTML = `<b>${selectedMsg}</b><br><br>` +
-                    `<span style="font-size:14px; color:#15803d;">¡Excelente eficiencia! Usaste <b>${totalBlocks}</b> de <b>${maxLimit}</b> bloques estimados.<br>` +
-                    `Puntuación obtenida: <b>+10 puntos</b> 🏆</span>`;
-            }
+    if (totalBlocks > maxLimit) {
+        levelScores[currentLevel] = 7;
+        if (titleEl) titleEl.innerText = "⚡ Reto Completado";
+        if (textEl) {
+            textEl.innerHTML = `<b>¡Buen trabajo! Sin embargo, puedes mejorar, ya que este reto puede resolverse con menos bloques.</b><br><br>` +
+                `<span style="font-size:13px; color:#64748b;">Usaste <b>${totalBlocks}</b> bloques (límite recomendado: <b>${maxLimit}</b>).<br>` +
+                `Puntuación de este intento: <b>+7 puntos</b>. ¡Reinténtalo para ganar +10 pts!</span>`;
         }
     } else {
-        if (titleEl) titleEl.innerText = "✨ ¡Nivel Superado! ✨";
-        if (textEl) textEl.innerHTML = `<b>${selectedMsg}</b>`;
+        levelScores[currentLevel] = 10;
+        if (titleEl) titleEl.innerText = "✨ ¡Nivel Superado con Éxito! ✨";
+        const randomIndex = Math.floor(Math.random() * motivationalSuccessMessages.length);
+        const selectedMsg = motivationalSuccessMessages[randomIndex];
+        if (textEl) {
+            textEl.innerHTML = `<b>${selectedMsg}</b><br><br>` +
+                `<span style="font-size:13px; color:#15803d;">¡Excelente eficiencia! Usaste <b>${totalBlocks}</b> de <b>${maxLimit}</b> bloques estimados.<br>` +
+                `Puntuación obtenida: <b>+10 puntos</b> 🏆</span>`;
+        }
     }
 
     updateScoreUI();
@@ -973,20 +1003,12 @@ function executeStep(command) {
         const nextX = bot.x + vec.dx;
         const nextY = bot.y + vec.dy;
         
-        // Colisión con bordes del mapa
-        if (nextX < 0 || nextX >= GRID_SIZE || nextY < 0 || nextY >= GRID_SIZE) {
-            showCrashWarning(bot.x, bot.y);
-            return false;
-        }
+        if (nextX < 0 || nextX >= GRID_SIZE || nextY < 0 || nextY >= GRID_SIZE) return false;
         
-        // Colisión con obstáculos (Curso 2 y 3)
         if (currentCourse > 1) {
             const mapSet = currentCourse === 2 ? labyrinthMaps : nestedLoopMaps;
             const terrain = mapSet[currentLevel].grid[nextY][nextX];
-            if (terrain === 'M' || terrain === 'V') {
-                showCrashWarning(nextX, nextY);
-                return false; 
-            }
+            if (terrain === 'M' || terrain === 'V') return false; 
         }
         
         bot.x = nextX;
@@ -1010,30 +1032,13 @@ function checkVictory() {
 }
 
 function advanceLevel() {
-    // VERIFICAR SI YA COMPLETÓ TODOS LOS 12 NIVELES DEL CURSO ACTUAL
-    const totalCompleted = completedLevels[currentCourse].length;
-
-    if (totalCompleted === TOTAL_LEVELS) {
-        // OBTENER CERTIFICADO SOLO SI SUPERÓ LOS 12 NIVELES
-        document.getElementById('student-name').value = '';
-        switchScreen('screen-certificate');
-        drawCertificate();
-    } else if (currentLevel < TOTAL_LEVELS) {
+    if (currentLevel < TOTAL_LEVELS) {
         currentLevel++;
         generateLevelMap();
     } else {
-        // SI ESTÁ EN EL NIVEL 12 PERO HIZO SALTOS Y NO HA COMPLETADO LOS 12 NIVELES
-        const missingCount = TOTAL_LEVELS - totalCompleted;
-        alert(`⚠️ Para obtener tu certificado debes completar todos los 12 niveles. Aún te faltan ${missingCount} nivel(es) por superar.`);
-        
-        // Buscar el primer nivel que no haya completado para enviarlo allí
-        for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
-            if (!completedLevels[currentCourse].includes(lvl)) {
-                currentLevel = lvl;
-                break;
-            }
-        }
-        generateLevelMap();
+        document.getElementById('student-name').value = '';
+        switchScreen('screen-certificate');
+        drawCertificate();
     }
 }
 
@@ -1041,6 +1046,7 @@ function drawCertificate() {
     const canvas = document.getElementById('cert-canvas');
     const ctx = canvas.getContext('2d');
     const name = document.getElementById('student-name').value || "[Tu Nombre Aquí]";
+    const finalScore = calculateTotalScore();
     
     let courseTitle = "Curso 1: Primeros pasos";
     if (currentCourse === 2) courseTitle = "Curso 2: Laberintos";
@@ -1061,17 +1067,13 @@ function drawCertificate() {
     ctx.fillText(name, 325, 175);
 
     ctx.fillStyle = "#475569"; ctx.font = "14px 'Segoe UI'";
-    ctx.fillText("Por haber completado exitosamente los 12 niveles del módulo:", 325, 230);
+    ctx.fillText("Por haber completado exitosamente todas las actividades del módulo:", 325, 230);
 
     ctx.fillStyle = "#00b4c6"; ctx.font = "bold 19px 'Segoe UI'";
     ctx.fillText(courseTitle, 325, 265);
 
-    // SOLO SE MUESTRA LA PUNTUACIÓN ACUMULADA AL FINALIZAR EL CURSO DE BUCLES ANIDADOS
-    if (currentCourse === 3) {
-        const finalScore = calculateTotalScore();
-        ctx.fillStyle = "#854d0e"; ctx.font = "bold 16px 'Segoe UI'";
-        ctx.fillText(`Puntuación Final Acumulada: ${finalScore} / 120 pts`, 325, 310);
-    }
+    ctx.fillStyle = "#854d0e"; ctx.font = "bold 16px 'Segoe UI'";
+    ctx.fillText(`Puntuación Final Acumulada: ${finalScore} / 120 pts`, 325, 310);
 
     ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(220, 380); ctx.lineTo(430, 380); ctx.stroke();
     ctx.fillStyle = "#64748b"; ctx.font = "italic 12px 'Segoe UI'";
@@ -1115,5 +1117,8 @@ function acceptCertificateAndContinue() {
     }
 }
 
-// Inicialización de interfaz inicial
-updateHomeUI();
+// Evento de inicialización cuando el documento está completamente cargado
+window.addEventListener('load', () => {
+    initTouchDragSupport();
+    updateHomeUI();
+});
