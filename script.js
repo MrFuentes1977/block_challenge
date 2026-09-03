@@ -421,7 +421,7 @@ function updateHomeUI() {
             card.classList.remove('locked');
             card.classList.add('unlocked');
             badge.className = "course-badge b-unlocked";
-            badge.innerText = "Habilitado";
+            badge.innerText = "HABILITADO";
         }
     });
 }
