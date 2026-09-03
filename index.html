@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programación en Bloques: Plataforma Educativa</title>
     <!-- Vinculación del archivo CSS externo -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -20,23 +20,28 @@
                 <div class="home-subtitle">Elige un curso para comenzar tu aventura de codificación</div>
                 
                 <div class="courses-grid">
+                    <!-- Tarjeta Curso 1 -->
                     <div id="card-course-1" class="course-card unlocked" onclick="startCourse(1)">
                         <div>
-                            <span class="course-badge b-unlocked">Habilitado</span>
+                            <span class="course-badge b-unlocked">HABILITADO</span>
                             <h3>Curso 1: Primeros pasos</h3>
                             <p>Aprende las nociones básicas de movimiento y bucles simples en espacios abiertos interactivos.</p>
                         </div>
                     </div>
+
+                    <!-- Tarjeta Curso 2 -->
                     <div id="card-course-2" class="course-card locked" onclick="startCourse(2)">
                         <div>
-                            <span id="badge-course-2" class="course-badge b-locked">Bloqueado</span>
+                            <span id="badge-course-2" class="course-badge b-locked">BLOQUEADO</span>
                             <h3>Curso 2: Laberintos</h3>
                             <p>Supera obstáculos fijos y muros perimetrales desafiantes aplicando secuencias óptimas. (Requiere clave si saltas el Curso 1)</p>
                         </div>
                     </div>
+
+                    <!-- Tarjeta Curso 3 -->
                     <div id="card-course-3" class="course-card locked" onclick="startCourse(3)">
                         <div>
-                            <span id="badge-course-3" class="course-badge b-locked">Bloqueado</span>
+                            <span id="badge-course-3" class="course-badge b-locked">BLOQUEADO</span>
                             <h3>Curso 3: Bucles Anidados</h3>
                             <p>Domina patrones complejos colocando bucles dentro de otros bucles. ¡Ahorra bloques y resuelve grandes desafíos!</p>
                         </div>
