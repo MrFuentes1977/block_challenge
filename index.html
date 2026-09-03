@@ -4,8 +4,419 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programación en Bloques: Plataforma Educativa</title>
-    <!-- Vinculación del archivo CSS externo -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #e5e5e5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* VISTAS DE PANTALLA */
+        .screen {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        /* PORTADA INICIAL */
+        .home-container {
+            max-width: 1050px;
+            margin: 30px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .home-title {
+            color: #00b4c6;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .home-subtitle {
+            color: #64748b;
+            font-size: 16px;
+            margin-bottom: 35px;
+        }
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .course-card {
+            background: #f8fafc;
+            border: 3px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 22px;
+            text-align: left;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .course-card.unlocked:hover {
+            border-color: #00b4c6;
+            transform: translateY(-3px);
+            background: #f0fdfa;
+            box-shadow: 0 6px 15px rgba(0, 180, 198, 0.15);
+        }
+        .course-card.locked {
+            opacity: 0.85;
+            background: #f1f5f9;
+        }
+        .course-card.locked:hover {
+            border-color: #ff00a0;
+            background: #fff0f6;
+        }
+        .course-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            align-self: flex-start;
+        }
+        .course-badge.b-unlocked { background: #dcfce7; color: #15803d; }
+        .course-badge.b-locked { background: #fee2e2; color: #b91c1c; }
+        .course-card h3 { margin: 0 0 10px 0; color: #334155; font-size: 18px; }
+        .course-card p { margin: 0; font-size: 13px; color: #64748b; line-height: 1.4; }
+
+        /* ENCABEZADO Y WIDGETS */
+        header {
+            background-color: #00b4c6;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            min-height: 60px;
+            z-index: 20;
+        }
+        header h1 { margin: 0; font-size: 18px; }
+        .btn-back-home {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: background 0.2s;
+        }
+        .btn-back-home:hover { background: rgba(255,255,255,0.3); }
+
+        .header-widgets {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .score-container {
+            background-color: #fef08a;
+            color: #854d0e;
+            border: 2px solid #eab308;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            background-color: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 20px;
+            gap: 8px;
+        }
+        .progress-label { color: #475569; font-weight: bold; font-size: 13px; }
+        .progress-dots { display: flex; gap: 6px; }
+        .dot-level {
+            width: 24px; height: 24px; border-radius: 50%;
+            background-color: #ffffff; border: 2px solid #cbd5e1;
+            color: #64748b; font-size: 11px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dot-level:hover {
+            transform: scale(1.1);
+            border-color: #00b4c6;
+        }
+        .dot-level.active {
+            border-color: #00b4c6; color: #00b4c6;
+            transform: scale(1.15); box-shadow: 0 0 8px rgba(0, 180, 198, 0.4);
+        }
+        .dot-level.completed { background-color: #00cc66; border-color: #00aa55; color: white; }
+
+        /* INTERFAZ PRINCIPAL */
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; background-color: #e5e5e5; }
+
+        /* COLUMNA 1: ESCENARIO Y GUÍA DUA */
+        .scenery-column {
+            width: 440px; min-width: 440px; padding: 18px;
+            display: flex; flex-direction: column; align-items: center;
+            background-color: #ffffff; border-right: 2px solid #ccc;
+            overflow-y: auto;
+        }
+
+        .dua-hint-banner {
+            background-color: #eff6ff;
+            border-left: 5px solid #3b82f6;
+            color: #1e40af;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.45;
+            width: 100%;
+            display: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        .dua-hint-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #1d4ed8;
+        }
+
+        .flat-grid {
+            display: grid; grid-template-columns: repeat(8, 45px); grid-template-rows: repeat(8, 45px);
+            gap: 2px; background-color: #bdc3c7; padding: 6px; border-radius: 8px;
+            touch-action: none;
+        }
+        .cell {
+            background-color: #f9f9f9; position: relative;
+            display: flex; align-items: center; justify-content: center; border-radius: 4px;
+        }
+        .cell.wall-brown { background-color: #8B5A2B; border: 1px solid #5c3a1a; }
+        .cell.grass-green { background-color: #22c55e; border: 1px solid #16a34a; }
+        .cell.start-cell { background-color: #00a6ed; border: 2px solid #0077ab;}
+        .cell.target-cell { background-color: #f03a47; border: 2px solid #b81420;}
+        .cell.target-cell.victory { background-color: #00cc66; box-shadow: 0 0 20px #00cc66; animation: pulse 1s infinite alternate; }
+
+        /* Indicadores visuales de orientación en el tablero */
+        .cell-arrow-hint {
+            font-size: 24px;
+            font-weight: 900;
+            color: #d97706;
+            z-index: 5;
+            pointer-events: none;
+            line-height: 1;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        /* EFECTO DE ADVERTENCIA POR CHOQUE */
+        .cell-crash-warning {
+            position: absolute;
+            font-size: 28px;
+            z-index: 20;
+            pointer-events: none;
+            animation: popWarning 0.6s ease-out forwards;
+        }
+
+        @keyframes popWarning {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.4) rotate(10deg); opacity: 1; }
+            70% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        .bot {
+            width: 38px; height: 38px; position: absolute; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s ease-in-out;
+        }
+        .tank-sprite { width: 100%; height: 100%; }
+
+        .controls-row { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        .btn-run { width: 100%; padding: 12px; font-weight: bold; font-size: 17px; border: none; border-radius: 6px; cursor: pointer; color: white; background-color: #00cc66; box-shadow: 0 3px 4px rgba(0,0,0,0.15); }
+        .btn-run:hover { background-color: #00aa55; }
+        .btn-reset { width: 100%; padding: 10px; font-weight: bold; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; color: white; background-color: #a6b1b9; box-shadow: 0 3px 4px rgba(0,0,0,0.15); }
+        .btn-reset:hover { background-color: #8a96a0; }
+
+        /* COLUMNA 2: BLOQUES ESTILO ROMPECABEZAS */
+        .toolbox-column { width: 200px; background-color: #e9e9e9; border-right: 2px solid #ccc; display: flex; flex-direction: column; }
+        .column-header { background-color: #333e48; color: white; padding: 12px; font-size: 14px; font-weight: bold; text-align: center; }
+        .toolbox-blocks { padding: 20px 10px; display: flex; flex-direction: column; gap: 20px; align-items: center; flex: 1; }
+
+        .block-element {
+            width: 175px; height: 54px; color: white; font-size: 13px; font-weight: bold; cursor: grab;
+            display: flex; align-items: center; justify-content: flex-start; padding-left: 14px; position: relative;
+            clip-path: polygon(0% 0%, 20% 0%, 28% 22%, 46% 22%, 54% 0%, 100% 0%, 100% 78%, 54% 78%, 46% 100%, 28% 100%, 20% 78%, 0% 78%);
+            background-color: #00b4c6; 
+            padding-bottom: 12px;
+            touch-action: none;
+        }
+
+        /* ESTILOS PARA ÍCONOS VECTORIALES SVG EN BLOQUES */
+        .block-element svg.block-icon {
+            width: 26px;
+            height: 26px;
+            margin-left: auto;
+            margin-right: 14px;
+            fill: white;
+            filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));
+        }
+
+        .block-element.loop-btn { 
+            background-color: #ff00a0; 
+            font-size: 15px; 
+            clip-path: polygon(0% 0%, 20% 0%, 28% 22%, 46% 22%, 54% 0%, 100% 0%, 100% 78%, 54% 78%, 46% 100%, 28% 100%, 20% 78%, 0% 78%);
+        } 
+
+        /* COLUMNA 3: ESPACIO DE TRABAJO Y BUCLES ANIDADOS */
+        .workspace-column { flex: 1; background-color: #ffffff; display: flex; flex-direction: column; }
+        .workspace-header-container { background-color: #333e48; color: white; padding: 6px 15px; display: flex; align-items: center; justify-content: space-between; min-height: 43px; }
+        .workspace-title { font-size: 14px; font-weight: bold; transition: color 0.2s; }
+
+        .btn-reestablecer { background-color: #ff5500; border: 3px solid #ff5500; padding: 4px 14px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+        .btn-reestablecer-inner { background-color: white; color: black; font-weight: 900; font-size: 12px; padding: 3px 18px; border-radius: 2px; text-transform: uppercase; }
+
+        .workspace-area { flex: 1; padding: 20px; overflow-y: auto; background-image: radial-gradient(#d0d0d0 1.5px, transparent 1.5px); background-size: 20px 20px; }
+
+        .start-block { 
+            background-color: #ffa400; color: white; padding: 12px; font-weight: bold; font-size: 15px; width: 175px; text-align: center; 
+            clip-path: polygon(0% 0%, 100% 0%, 100% 78%, 54% 78%, 46% 100%, 28% 100%, 20% 78%, 0% 78%); 
+            padding-bottom: 22px; 
+            margin-bottom: -11px; 
+        }
+
+        .blocks-stack { display: flex; flex-direction: column; align-items: flex-start; padding-left: 15px; min-height: 350px; width: 100%; }
+
+        /* Acoples para muescas y bucles anidados */
+        .blocks-stack > .block-element { margin-top: -11px; }
+        .loop-body-slots > .block-element { margin-top: -10px; width: 100%; }
+
+        .loop-container-block {
+            background-color: #ff00a0; border-radius: 4px; padding: 8px; width: 235px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            clip-path: polygon(0% 0%, 20% 0%, 28% 12%, 46% 12%, 54% 0%, 100% 0%, 100% 90%, 54% 90%, 46% 100%, 28% 100%, 20% 90%, 0% 90%);
+            padding-bottom: 20px; margin-top: -11px; cursor: grab;
+            touch-action: none;
+        }
+        .loop-body-slots > .loop-container-block {
+            width: 100%;
+            margin-top: -10px;
+        }
+        .loop-header { display: flex; align-items: center; justify-content: space-between; color: white; font-weight: bold; font-size: 15px; padding-left: 5px; pointer-events: none; margin-top: 6px; }
+        .loop-header select { font-size: 13px; font-weight: bold; padding: 2px 4px; border-radius: 4px; border: none; background: white; color: #ff00a0; outline: none; pointer-events: auto; }
+        .loop-body-slots { background-color: rgba(0, 0, 0, 0.15); border: 2px dashed rgba(255, 255, 255, 0.4); border-radius: 6px; min-height: 65px; padding: 12px 6px; display: flex; flex-direction: column; margin-top: 2px; }
+
+        .executing { background-color: #facc15 !important; box-shadow: 0 0 15px #facc15 !important; transform: scale(1.02); z-index: 10; }
+        .drag-over { background-color: rgba(0, 180, 198, 0.2) !important; border-radius: 8px; }
+        .trash-can-active { background-color: #fca5a5 !important; border-right: 4px dashed #ef4444; }
+
+        /* Elemento fantasma para arrastre táctil */
+        .touch-drag-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.88;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        /* CERTIFICADO */
+        .cert-container {
+            max-width: 700px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center;
+        }
+        .input-name-field { padding: 12px; font-size: 16px; width: 80%; margin: 15px 0; border: 2px solid #cbd5e1; border-radius: 6px; }
+        .cert-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .btn-cert { padding: 12px 25px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; }
+        .btn-cert-download { background-color: #ff5500; color: white; }
+        .btn-cert-next { background-color: #00cc66; color: white; }
+
+        /* MODALES REFUERZO DUA */
+        .dua-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center;
+        }
+        .dua-modal-content {
+            background: white; padding: 30px; border-radius: 12px; max-width: 480px; width: 90%;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        .error-border { border-top: 8px solid #ffa400; background-color: #fffbeb; }
+        .success-border { border-top: 8px solid #00cc66; background-image: radial-gradient(rgba(0,180,198,0.05) 1px, transparent 0); background-size: 12px 12px; }
+
+        .dua-modal-title { font-size: 22px; margin-bottom: 15px; font-weight: bold; }
+        .title-amber { color: #b45309; }
+        .title-green { color: #15803d; font-size: 24px; }
+
+        .dua-modal-text { color: #475569; font-size: 16px; margin-bottom: 25px; line-height: 1.5; font-weight: 500; }
+        .btn-dua-close { background-color: #00b4c6; color: white; border: none; padding: 12px 30px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 16px; box-shadow: 0 3px 5px rgba(0,0,0,0.1); }
+        .btn-dua-close:hover { background-color: #009cb0; }
+        .btn-dua-error-retry { background-color: #ff5500; }
+        .btn-dua-error-retry:hover { background-color: #e04a00; }
+        .btn-dua-success { background-color: #00cc66; }
+        .btn-dua-success:hover { background-color: #00aa55; }
+
+        footer {
+            background-color: #222; color: #bbb; text-align: center; padding: 12px; font-size: 13px;
+            border-top: 3px solid #00b4c6; z-index: 20;
+        }
+
+        /* ADAPTACIÓN MÓVIL Y TABLET (HASTA 900px) SIN CAMBIAR EL DISEÑO DE ESCRITORIO */
+        @media (max-width: 900px) {
+            .home-container { margin: 15px; padding: 20px; }
+            .courses-grid { grid-template-columns: 1fr; }
+            .main-wrapper { flex-direction: column; overflow-y: auto; }
+            .scenery-column { width: 100%; min-width: 100%; border-right: none; border-bottom: 2px solid #ccc; padding: 12px; }
+            .flat-grid {
+                grid-template-columns: repeat(8, calc((100vw - 40px) / 8));
+                grid-template-rows: repeat(8, calc((100vw - 40px) / 8));
+                max-width: 380px;
+                max-height: 380px;
+            }
+            @media (min-width: 420px) {
+                .flat-grid {
+                    grid-template-columns: repeat(8, 45px);
+                    grid-template-rows: repeat(8, 45px);
+                }
+            }
+            .bot {
+                width: calc((100vw - 40px) / 8 - 4px);
+                height: calc((100vw - 40px) / 8 - 4px);
+                max-width: 38px;
+                max-height: 38px;
+            }
+            .toolbox-column { width: 100%; min-width: 100%; border-right: none; border-bottom: 2px solid #ccc; }
+            .toolbox-blocks { flex-direction: row; flex-wrap: wrap; justify-content: center; padding: 10px; gap: 10px; }
+            .block-element { width: 160px; height: 50px; font-size: 12px; }
+            .workspace-column { width: 100%; min-height: 360px; }
+            header { flex-wrap: wrap; gap: 8px; }
+        }
+    </style>
 </head>
 <body>
 
@@ -20,28 +431,23 @@
                 <div class="home-subtitle">Elige un curso para comenzar tu aventura de codificación</div>
                 
                 <div class="courses-grid">
-                    <!-- Tarjeta Curso 1 -->
                     <div id="card-course-1" class="course-card unlocked" onclick="startCourse(1)">
                         <div>
-                            <span class="course-badge b-unlocked">HABILITADO</span>
+                            <span class="course-badge b-unlocked">Habilitado</span>
                             <h3>Curso 1: Primeros pasos</h3>
                             <p>Aprende las nociones básicas de movimiento y bucles simples en espacios abiertos interactivos.</p>
                         </div>
                     </div>
-
-                    <!-- Tarjeta Curso 2 -->
                     <div id="card-course-2" class="course-card locked" onclick="startCourse(2)">
                         <div>
-                            <span id="badge-course-2" class="course-badge b-locked">BLOQUEADO</span>
+                            <span id="badge-course-2" class="course-badge b-locked">Bloqueado</span>
                             <h3>Curso 2: Laberintos</h3>
                             <p>Supera obstáculos fijos y muros perimetrales desafiantes aplicando secuencias óptimas. (Requiere clave si saltas el Curso 1)</p>
                         </div>
                     </div>
-
-                    <!-- Tarjeta Curso 3 -->
                     <div id="card-course-3" class="course-card locked" onclick="startCourse(3)">
                         <div>
-                            <span id="badge-course-3" class="course-badge b-locked">BLOQUEADO</span>
+                            <span id="badge-course-3" class="course-badge b-locked">Bloqueado</span>
                             <h3>Curso 3: Bucles Anidados</h3>
                             <p>Domina patrones complejos colocando bucles dentro de otros bucles. ¡Ahorra bloques y resuelve grandes desafíos!</p>
                         </div>
@@ -73,7 +479,7 @@
             <!-- COLUMNA 1: ESCENARIO Y GUÍA DUA -->
             <div class="scenery-column">
                 <div id="dua-hint-banner" class="dua-hint-banner">
-                    <div class="dua-hint-title">💡 <span>Guía de Aprendizaje DUA</span></div>
+                    <div class="dua-hint-title">💡 <span>Instrucciones</span></div>
                     <div id="dua-hint-text">Cargando sugerencia...</div>
                 </div>
 
@@ -84,18 +490,27 @@
                 </div>
             </div>
 
-            <!-- COLUMNA 2: BLOQUES -->
+            <!-- COLUMNA 2: BLOQUES CON SVG ACCESIBLES -->
             <div class="toolbox-column" id="toolbox-column" ondragover="allowDropTrash(event)" ondragleave="dragLeaveTrash(event)" ondrop="dropTrash(event)">
                 <div class="column-header">Bloques</div>
                 <div class="toolbox-blocks">
                     <div class="block-element move" draggable="true" data-type="avanzar" ondragstart="dragFromToolbox(event, 'avanzar')">
-                        <span>avanzar</span><span class="arrow-icon">→</span>
+                        <span>avanzar</span>
+                        <svg class="block-icon" viewBox="0 0 100 100">
+                            <path d="M 10,32 H 55 V 15 L 90,50 L 55,85 V 68 H 10 Z" />
+                        </svg>
                     </div>
                     <div class="block-element turn-left" draggable="true" data-type="izquierda" ondragstart="dragFromToolbox(event, 'izquierda')">
-                        <span>girar a la izquierda</span><span class="turn-icon">↺</span>
+                        <span>girar a la izquierda</span>
+                        <svg class="block-icon" viewBox="0 0 100 100">
+                            <path d="M 85,85 V 50 C 85,32 70,18 52,18 H 40 V 2 L 10,32 L 40,62 V 45 H 52 C 58,45 65,51 65,58 V 85 Z" />
+                        </svg>
                     </div>
                     <div class="block-element turn-right" draggable="true" data-type="derecha" ondragstart="dragFromToolbox(event, 'derecha')">
-                        <span>girar a la derecha</span><span class="turn-icon">↻</span>
+                        <span>girar a la derecha</span>
+                        <svg class="block-icon" viewBox="0 0 100 100">
+                            <path d="M 15,85 V 50 C 15,32 30,18 48,18 H 60 V 2 L 90,32 L 60,62 V 45 H 48 C 42,45 35,51 35,58 V 85 Z" />
+                        </svg>
                     </div>
                     <div class="block-element loop-btn" draggable="true" data-type="loop" ondragstart="dragFromToolbox(event, 'loop')">Repetir</div>
                 </div>
@@ -104,7 +519,7 @@
             <!-- COLUMNA 3: ESPACIO DE TRABAJO -->
             <div class="workspace-column">
                 <div class="workspace-header-container">
-                    <div class="workspace-title" id="workspace-title-count">Espacio de trabajo: 0 bloques</div>
+                    <div class="workspace-title" id="workspace-title-count">Espacio de trabajo</div>
                     <button class="btn-reestablecer" onclick="clearWorkspaceOnly()">
                         <div class="btn-reestablecer-inner">Reestablecer</div>
                     </button>
@@ -142,7 +557,19 @@
         </div>
     </div>
 
-    <!-- MODALES DUA -->
+    <!-- MODALES DUA Y CLAVE DE ACCESO -->
+    <div id="password-modal" class="dua-modal">
+        <div class="dua-modal-content error-border" style="border-top-color: #00b4c6;">
+            <div class="dua-modal-title" style="color: #00b4c6;">🔑 Acceso a Curso</div>
+            <div class="dua-modal-text">Introduce la clave de acceso para desbloquear este curso:</div>
+            <input type="password" id="course-password-input" class="input-name-field" style="width: 100%; text-align: center; font-size: 20px;" placeholder="••••" onkeydown="if(event.key==='Enter') confirmCoursePassword()">
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
+                <button class="btn-dua-close btn-dua-error-retry" style="background-color:#a6b1b9;" onclick="closePasswordModal()">Cancelar</button>
+                <button class="btn-dua-close" onclick="confirmCoursePassword()">Acceder ➔</button>
+            </div>
+        </div>
+    </div>
+
     <div id="dua-error-modal" class="dua-modal">
         <div class="dua-modal-content error-border">
             <div class="dua-modal-title title-amber">¡Vamos, tú puedes! 💪✨</div>
@@ -163,10 +590,1268 @@
     </div>
 
     <footer>
-        Todos los derechos reservados. Página creada por Pedro Javier Fuentes Parada
+        Todos los derechos reservados. Página creada por Pedro Javier Fuentes Parada &copy;2026
     </footer>
 
-    <!-- Vinculación del archivo JavaScript externo -->
-    <script src="script.js"></script>
+    <script>
+        const GRID_SIZE = 8;
+        const TOTAL_LEVELS = 12;
+
+        let currentCourse = 1;
+        let currentLevel = 1;
+        let unlockedCourses = [1]; 
+        let pendingCourseToUnlock = null;
+
+        // SEGUIMIENTO DE NIVELES COMPLETADOS POR CADA CURSO
+        let completedLevels = {
+            1: [],
+            2: [],
+            3: []
+        };
+
+        // LÍMITES DE BLOQUES POR RETO (SOLO APLICAN EN EL CURSO 3)
+        const levelBlockLimits = {
+            1: 7,  // Reto 1
+            2: 7,  // Reto 2
+            3: 4,  // Reto 3
+            4: 14, // Reto 4
+            5: 4,  // Reto 5
+            6: 7,  // Reto 6
+            7: 5,  // Reto 7
+            8: 13, // Reto 8
+            9: 13, // Reto 9
+            10: 9, // Reto 10
+            11: 9, // Reto 11
+            12: 13 // Reto 12
+        };
+
+        // SISTEMA DE PUNTUACIÓN (SOLO PARA EL CURSO 3)
+        let levelScores = {};
+
+        function getLevelMaxBlocks() {
+            return levelBlockLimits[currentLevel] || 5;
+        }
+
+        function calculateTotalScore() {
+            let sum = 0;
+            for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+                if (levelScores[lvl] !== undefined) {
+                    sum += levelScores[lvl];
+                }
+            }
+            return sum;
+        }
+
+        function updateScoreUI() {
+            const scoreContainer = document.getElementById('score-container');
+            if (currentCourse === 3) {
+                if (scoreContainer) scoreContainer.style.display = 'flex';
+                const total = calculateTotalScore();
+                const scoreEl = document.getElementById('total-score');
+                if (scoreEl) {
+                    scoreEl.innerText = total;
+                }
+            } else {
+                if (scoreContainer) scoreContainer.style.display = 'none';
+            }
+        }
+
+        let startPos = { x: 0, y: 0 };
+        let targetPos = { x: 0, y: 0 };
+        let bot = { x: 0, y: 0, dir: 0 }; 
+
+        const rotationDegrees = [0, 90, 180, 270];
+        const dirVectors = [
+            { dx: 1, dy: 0 },  
+            { dx: 0, dy: 1 },  
+            { dx: -1, dy: 0 }, 
+            { dx: 0, dy: -1 }  
+        ];
+
+        const motivationalSuccessMessages = [
+            "🎉 ¡Excelente trabajo! Has superado este nivel con dedicación y esfuerzo, sigue avanzando hacia nuevos retos.",
+            "🚀 ¡Felicitaciones! Tu constancia y habilidades te han llevado a completar este curso, el siguiente desafío te espera.",
+            "🌟 ¡Muy bien hecho! Cada paso que das te acerca más a convertirte en un gran programador.",
+            "🏆 ¡Lo lograste! Cada nivel superado demuestra tu esfuerzo y compromiso con el aprendizaje.",
+            "💡 ¡Gran avance! Tu curiosidad y dedicación te están llevando cada vez más lejos en el mundo de la programación."
+        ];
+
+        const motivationalErrorMessages = [
+            "🌱 No pasa nada, cada intento te acerca más al éxito. ¡Sigue practicando y lo lograrás!",
+            "💪 El esfuerzo que haces hoy será tu fortaleza mañana. ¡Inténtalo de nuevo, tú puedes!",
+            "🔄 Equivocarse es parte del aprendizaje. Cada error es una oportunidad para mejorar.",
+            "✨ Recuerda: los grandes programadores también empezaron fallando. ¡Tu progreso está en marcha!",
+            "🚀 No te rindas, cada nivel es un reto que te prepara para el siguiente. ¡Vuelve a intentarlo!"
+        ];
+
+        // EXPLICACIONES DUA PARA LOS NIVELES DEL CURSO 1, CURSO 2 Y CURSO 3
+        const duaLevelHints = {
+            1: {
+                1: "<b>Paso 1: Orientación inicial.</b> Observa hacia dónde mira el robot y usa el bloque <b>avanzar</b> para dar el primer paso. Si necesitas cambiar de dirección, usa <b>girar a la derecha</b> o <b>girar a la izquierda</b> para alinearte con la casilla roja.",
+                2: "<b>Paso 2: Combinando giros y avance.</b> Para este reto, gira primero hacia la dirección correcta usando <b>girar a la derecha</b> o <b>girar a la izquierda</b>. Luego, arrastra los bloques <b>avanzar</b> necesarios hasta llegar al objetivo.",
+                3: "<b>Paso 3: Trayecto completo.</b> Planifica tu secuencia: avanza los pasos necesarios, gira a la izquierda o derecha según la esquina, y vuelve a avanzar. ¡Prueba combinar ambos giros con los pasos rectos!",
+                4: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                5: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                6: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                7: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                8: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                9: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                10: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                11: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!",
+                12: "Tu objetivo es guiar al robot desde la casilla de inicio (azul) hasta la meta (roja). ¡Planifica tus bloques de avanzar y girar!"
+            },
+            2: {
+                1: "Lleva al robot desde la casilla azul hasta la casilla roja siguiendo el camino correcto.",
+                2: "Tu tarea es guiar al personaje desde el punto azul hasta el punto rojo sin chocar con los obstáculos.",
+                3: "Programa los movimientos necesarios para que el robot llegue del inicio (azul) al destino (rojo).",
+                4: "Diseña la ruta que conecte azul con rojo usando los bloques de avanzar y girar.",
+                5: "Haz que el robot recorra el trayecto desde azul hasta rojo paso a paso.",
+                6: "Planifica la secuencia de comandos para mover al robot desde azul hasta rojo.",
+                7: "Tu misión: encontrar el camino más corto entre azul y rojo. ¡Usa tu lógica!",
+                8: "Indica los movimientos que permitirán al robot llegar del punto azul al punto rojo.",
+                9: "Construye el recorrido que lleve al robot desde la posición azul hasta la meta roja.",
+                10: "Guía al robot desde azul hasta rojo evitando los muros y tomando el camino correcto.",
+                11: "Crea la secuencia de instrucciones para que el robot avance desde azul hasta rojo sin errores.",
+                12: "El reto consiste en mover al robot del punto azul al punto rojo usando los bloques adecuados."
+            },
+            3: {
+                1: "El robot sigue un camino que se repite tres veces. Si escribimos todas las instrucciones sería muy largo, pero con un bucle lo hacemos más fácil: repetimos 3 veces y dentro ponemos los pasos rectos y los giros. Así el programa es más rápido de escribir y más sencillo de entender.",
+                2: "El camino del robot es una escalera. Cada escalón se forma con dos pasos: avanzar y girar. Como todos los escalones son iguales, podemos usar un bucle que repita esa acción varias veces. Así el programa es más corto y más fácil de entender.",
+                3: "El robot debe recorrer un cuadrado. Cada lado se hace avanzando varias veces y luego girando. Como los cuatro lados son iguales, usamos un bucle que se repite 4 veces. Dentro ponemos los pasos rectos y al final de cada lado el giro. Así el programa es más corto y más fácil de entender.",
+                4: "El camino del robot está formado por varios tramos rectos que se alternan con giros, creando el patrón en zigzag.<br>Cada tramo recto se recorre avanzando varias casillas seguidas. 👉 Para esto usamos un bucle interno que repite la acción de avanzar.<br>El zigzag completo se construye repitiendo esos tramos rectos seguidos de un giro. 👉 Para esto usamos un bucle externo, que repite la secuencia “avanzar + girar” tantas veces como idas y vueltas tenga el camino.",
+                5: "El robot debe recorrer una espiral. Cada tramo se hace avanzando varias veces y luego girando. Como el patrón se repite, usamos un bucle externo para los lados de la espiral y dentro un bucle interno para los pasos rectos. Así el programa se reduce a solo dos bucles y es mucho más fácil de entender.",
+                6: "La misión es construir la ruta que conduce hasta la meta final.",
+                7: "El propósito es diseñar el trayecto que conduce al punto de llegada.",
+                8: "La tarea busca elaborar la ruta que guía al robot hasta su destino.",
+                9: "El reto consiste en crear el recorrido que conecta el inicio con la llegada.",
+                10: "La tarea es organizar los pasos que guían al punto de llegada.",
+                11: "La finalidad es programar el camino correcto para alcanzar el objetivo.",
+                12: "El reto busca diseñar la secuencia de movimientos que llevan al destino final."
+            }
+        };
+
+        // MAPAS DEL CURSO 2: LABERINTOS
+        const labyrinthMaps = {
+            1: { start: {x: 0, y: 3, dir: 0}, target: {x: 6, y: 6}, grid: [
+        ['V','V','V','V','V','V','V','V'],
+        ['V','V','V','V','V','V','V','V'],
+        ['M','M','M','M','M','M','M','M'],
+        ['C','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['V','V','V','V','V','M','C','M'],
+        ['V','V','V','V','V','M','C','M'],
+        ['V','V','V','V','V','M','M','M']] },
+            2: { start: {x: 0, y: 7, dir: 0}, target: {x: 2, y: 1}, grid:[
+        ['V','M','M','M','M','M','M','V'],
+        ['V','M','C','C','C','C','M','V'],
+        ['V','M','M','M','M','C','M','M'],
+        ['V','V','V','V','M','C','C','C'],
+        ['V','V','V','V','M','M','M','C'],
+        ['V','V','V','V','V','V','M','C'],
+        ['M','M','M','M','M','M','M','C'],
+        ['C','C','C','C','C','C','C','C']] },
+            3: { start: {x: 0, y: 0, dir: 1}, target: {x: 7, y: 7}, grid:[
+        ['C','M','M','M','V','V','V','V'],
+        ['C','C','C','M','V','V','V','V'],
+        ['M','M','C','M','M','M','V','V'],
+        ['V','M','C','C','C','M','V','V'],
+        ['V','M','M','M','C','M','M','M'],
+        ['V','V','V','M','C','C','C','M'],
+        ['V','V','V','M','M','M','C','M'],
+        ['V','V','V','V','V','M','C','C']] },
+            4: { start: {x: 6, y: 3, dir: 0}, target: {x: 1, y: 3}, grid:[
+        ['V','V','V','V','V','V','V','V'],
+        ['V','V','V','V','V','V','V','V'],
+        ['M','M','M','V','V','M','M','M'],
+        ['M','C','M','V','V','M','C','M'],
+        ['M','C','M','V','V','M','C','M'],
+        ['M','C','M','V','V','M','C','M'],
+        ['M','C','M','M','M','M','C','M'],
+        ['M','C','C','C','C','C','C','M']] },
+            5: { start: {x: 7, y: 7, dir: 2}, target: {x: 0, y: 0}, grid:[
+        ['C','C','C','M','V','V','V','V'],
+        ['V','M','C','M','V','V','V','V'],
+        ['M','M','C','M','V','V','V','V'],
+        ['C','C','C','M','V','V','V','V'],
+        ['C','M','M','M','V','V','V','V'],
+        ['C','M','V','M','M','M','M','M'],
+        ['C','M','M','M','M','M','M','M'],
+        ['C','C','C','C','C','C','C','C']] },
+            6: { start: {x: 4, y: 4, dir: 0}, target: {x: 7, y: 6}, grid:[
+        ['V','V','V','V','V','V','V','V'],
+        ['V','M','M','M','M','M','M','M'],
+        ['V','M','C','C','C','C','C','M'],
+        ['V','M','C','M','M','M','C','M'],
+        ['V','M','C','M','C','C','C','M'],
+        ['V','M','C','M','M','M','M','M'],
+        ['V','M','C','C','C','C','C','C'],
+        ['V','M','M','M','M','M','M','M']] },
+            7: { start: {x: 0, y: 7, dir: 0}, target: {x: 7, y: 1}, grid: [
+        ['V','V','V','V','M','M','M','M'],
+        ['V','V','V','V','M','C','C','C'],
+        ['V','V','V','M','M','C','M','M'],
+        ['V','M','M','M','C','C','M','V'],
+        ['V','M','C','C','C','M','M','V'],
+        ['M','M','C','M','M','M','V','V'],
+        ['M','M','C','M','V','V','V','V'],
+        ['C','C','C','M','V','V','V','V']] },
+            8: { start: {x: 6, y: 3, dir: 0}, target: {x: 2, y: 1}, grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['M','C','C','M','C','C','C','M'],
+        ['M','C','M','M','C','M','C','M'],
+        ['M','C','M','M','C','M','C','M'],
+        ['M','C','M','M','C','M','M','M'],
+        ['M','C','C','M','C','C','C','C'],
+        ['M','M','C','M','M','M','M','C'],
+        ['M','M','C','C','C','C','C','C']] },
+            9: { start: {x: 3, y: 3, dir: 0}, target: {x: 5, y: 3}, grid: [
+        ['V','V','M','C','C','C','C','C'],
+        ['V','V','M','C','M','M','M','C'],
+        ['V','V','M','C','M','V','M','C'],
+        ['V','V','M','C','M','C','M','C'],
+        ['M','M','M','M','M','C','M','C'],
+        ['C','C','C','C','C','C','M','C'],
+        ['C','M','M','M','M','M','M','C'],
+        ['C','C','C','C','C','C','C','C']] },
+            10: { start: {x: 4, y: 7, dir: 0}, target: {x: 4, y: 1}, grid: [
+        ['M','M','M','M','M','M','V','V'],
+        ['C','C','C','C','C','M','V','V'],
+        ['C','M','M','M','M','M','V','V'],
+        ['C','M','V','V','V','V','V','V'],
+        ['C','M','M','M','M','M','M','M'],
+        ['C','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['V','V','V','M','C','C','C','M']] },
+            11: { start: {x: 7, y: 0, dir: 0}, target: {x: 0, y: 7}, grid: [
+        ['V','V','V','V','M','M','C','C'],
+        ['V','V','V','M','M','C','C','M'],
+        ['V','V','M','M','C','C','M','M'],
+        ['V','M','M','C','C','M','M','V'],
+        ['M','M','C','C','M','M','V','V'],
+        ['M','C','C','M','M','V','V','V'],
+        ['C','C','M','M','V','V','V','V'],
+        ['C','M','M','V','V','V','V','V']] },
+            12: { start: {x: 3, y: 7, dir: 0}, target: {x: 2, y: 1}, grid: [
+        ['V','M','M','M','M','M','M','M'],
+        ['V','M','C','C','C','C','C','M'],
+        ['V','M','M','M','M','M','C','M'],
+        ['V','M','C','C','C','C','C','M'],
+        ['V','M','C','M','M','M','M','M'],
+        ['V','M','C','C','C','M','V','V'],
+        ['V','M','M','M','C','M','V','V'],
+        ['V','V','M','C','C','M','V','V']] }
+        };
+
+        // MAPAS DEL CURSO 3: BUCLES ANIDADOS
+        const nestedLoopMaps = {
+            1: { start: {x: 0, y: 0, dir: 0}, target: {x: 6, y: 6}, hints: [
+                {x: 2, y: 0, symbol: '↻'},
+                {x: 2, y: 2, symbol: '↺'}
+            ], grid: [
+        ['C','C','C','M','M','M','M','M'],
+        ['M','M','C','M','M','M','M','M'],
+        ['M','M','C','C','C','M','M','M'],
+        ['M','M','M','M','C','M','M','M'],
+        ['M','M','M','M','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            2: { start: {x: 0, y: 6, dir: 0}, target: {x: 6, y: 0}, hints: [
+                {x: 2, y: 6, symbol: '↺'},
+                {x: 2, y: 4, symbol: '↻'}
+            ], grid: [
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','C','C','C','M'],
+        ['M','M','M','M','C','M','M','M'],
+        ['M','M','C','C','C','M','M','M'],
+        ['M','M','C','M','M','M','M','M'],
+        ['C','C','C','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            3: { start: {x: 1, y: 1, dir: 0}, target: {x: 1, y: 3}, hints: [
+                {x: 6, y: 1, symbol: '↻'}
+            ], grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['M','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','C','M','M','M','M','C','M'],
+        ['M','C','M','M','M','M','C','M'],
+        ['M','C','M','M','M','M','C','M'],
+        ['M','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            4: { start: {x: 1, y: 1, dir: 0}, target: {x: 5, y: 5}, hints: [
+                {x: 5, y: 1, symbol: '↻'},
+                {x: 2, y: 3, symbol: '↺'}
+            ], grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['M','C','C','C','C','C','M','M'],
+        ['M','M','M','M','M','C','M','M'],
+        ['M','M','C','C','C','C','M','M'],
+        ['M','M','C','M','M','M','M','M'],
+        ['M','M','C','C','C','C','M','M'],
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            5: { start: {x: 0, y: 0, dir: 0}, target: {x: 0, y: 6}, hints: [
+                {x: 0, y: 6, symbol: '↻'}
+            ], grid: [
+        ['C','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['C','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            6: { start: {x: 0, y: 7, dir: 0}, target: {x: 6, y: 1}, grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','C','C','C','M'],
+        ['M','M','M','M','C','M','M','M'],
+        ['M','M','C','C','C','M','M','M'],
+        ['M','M','C','M','M','M','M','M'],
+        ['C','C','C','M','M','M','M','M'],
+        ['C','M','M','M','M','M','M','M'],
+        ['C','M','M','M','M','M','M','M']] },
+            7: { start: {x: 7, y: 7, dir: 2}, target: {x: 0, y: 0}, grid: [
+        ['C','C','M','M','M','M','M','M'],
+        ['M','C','C','M','M','M','M','M'],
+        ['M','M','C','C','M','M','M','M'],
+        ['M','M','M','C','C','M','M','M'],
+        ['M','M','M','M','C','C','M','M'],
+        ['M','M','M','M','M','C','C','M'],
+        ['M','M','M','M','M','M','C','C'],
+        ['M','M','M','M','M','M','M','C']] },
+            8: { start: {x: 1, y: 1, dir: 0}, target: {x: 6, y: 7}, grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['M','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','C','C','C','C','C','C','M'],
+        ['M','C','M','M','M','M','M','M'],
+        ['M','C','C','C','C','C','C','M'],
+        ['M','M','M','M','M','M','C','M'],
+        ['M','M','M','M','M','M','C','M']] },
+            9: { start: {x: 0, y: 0, dir: 0}, target: {x: 0, y: 6}, grid: [
+        ['C','C','C','C','C','C','C','C'],
+        ['M','M','M','M','M','M','M','C'],
+        ['C','C','C','C','C','C','C','C'],
+        ['C','M','M','M','M','M','M','M'],
+        ['C','C','C','C','C','C','C','C'],
+        ['M','M','M','M','M','M','M','C'],
+        ['C','C','C','C','C','C','C','C'],
+        ['M','M','M','M','M','M','M','M']] },
+            10: { start: {x: 0, y: 3, dir: 3}, target: {x: 7, y: 3}, grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['C','C','C','M','C','C','C','M'],
+        ['C','M','C','M','C','M','C','M'],
+        ['C','M','C','C','C','M','C','C'],
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            11: { start: {x: 0, y: 3, dir: 1}, target: {x: 7, y: 3}, grid: [
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M'],
+        ['C','M','C','C','C','M','C','C'],
+        ['C','M','C','M','C','M','C','M'],
+        ['C','C','C','M','C','C','C','M'],
+        ['M','M','M','M','M','M','M','M'],
+        ['M','M','M','M','M','M','M','M']] },
+            12: { start: {x: 7, y: 7, dir: 3}, target: {x: 0, y: 7}, grid: [
+        ['M','C','C','C','M','C','C','C'],
+        ['M','C','M','C','M','C','M','C'],
+        ['M','C','M','C','M','C','M','C'],
+        ['M','C','M','C','M','C','M','C'],
+        ['M','C','M','C','M','C','M','C'],
+        ['M','C','M','C','M','C','M','C'],
+        ['M','C','M','C','M','C','M','C'],
+        ['C','C','M','C','C','C','M','C']] }
+        };
+
+        const tankSVG = `
+            <svg class="tank-sprite" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="30" width="50" height="40" rx="6" fill="#4ade80" stroke="#1e3a1e" stroke-width="5"/>
+                <rect x="25" y="24" width="40" height="6" rx="2" fill="#22c55e" stroke="#1e3a1e" stroke-width="3"/>
+                <rect x="25" y="70" width="40" height="6" rx="2" fill="#22c55e" stroke="#1e3a1e" stroke-width="3"/>
+                <rect x="59" y="45" width="26" height="10" rx="2" fill="#4ade80" stroke="#1e3a1e" stroke-width="4"/>
+                <circle cx="45" cy="50" r="14" fill="#22c55e" stroke="#1e3a1e" stroke-width="4"/>
+            </svg>
+        `;
+
+        // CADENAS SVG DE ÍCONOS ACCESIBLES
+        const svgMove = `<svg class="block-icon" viewBox="0 0 100 100"><path d="M 10,32 H 55 V 15 L 90,50 L 55,85 V 68 H 10 Z" /></svg>`;
+        const svgTurnLeft = `<svg class="block-icon" viewBox="0 0 100 100"><path d="M 85,85 V 50 C 85,32 70,18 52,18 H 40 V 2 L 10,32 L 40,62 V 45 H 52 C 58,45 65,51 65,58 V 85 Z" /></svg>`;
+        const svgTurnRight = `<svg class="block-icon" viewBox="0 0 100 100"><path d="M 15,85 V 50 C 15,32 30,18 48,18 H 60 V 2 L 90,32 L 60,62 V 45 H 48 C 42,45 35,51 35,58 V 85 Z" /></svg>`;
+
+        let workspaceItems = []; 
+        let isExecuting = false;
+        let executionInterrupted = false;
+        let reachedTarget = false;
+
+        function parsePath(pathStr) {
+            if (!pathStr || pathStr === "") return [];
+            try {
+                return JSON.parse(pathStr);
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function getItemByPath(tree, path) {
+            if (!path || path.length === 0) return null;
+            let current = tree;
+            for (let i = 0; i < path.length; i++) {
+                const idx = path[i];
+                if (!current || !current[idx]) return null;
+                if (i === path.length - 1) return current[idx];
+                current = current[idx].innerBlocks;
+            }
+            return null;
+        }
+
+        function removeItemByPath(tree, path) {
+            if (!path || path.length === 0) return null;
+            let current = tree;
+            for (let i = 0; i < path.length - 1; i++) {
+                if (!current || !current[path[i]]) return null;
+                current = current[path[i]].innerBlocks;
+            }
+            const removedIndex = path[path.length - 1];
+            if (!current || removedIndex >= current.length) return null;
+            return current.splice(removedIndex, 1)[0];
+        }
+
+        function getTargetListByPath(tree, path) {
+            if (!path || path.length === 0) return tree;
+            let item = getItemByPath(tree, path);
+            if (item && item.type === 'loop') return item.innerBlocks;
+            return tree;
+        }
+
+        function isDescendantPath(parentPath, childPath) {
+            if (parentPath.length >= childPath.length) return false;
+            return parentPath.every((val, idx) => childPath[idx] === val);
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startCourse(courseNum) {
+            if (courseNum > 1 && !unlockedCourses.includes(courseNum)) {
+                pendingCourseToUnlock = courseNum;
+                document.getElementById('course-password-input').value = '';
+                document.getElementById('password-modal').style.display = 'flex';
+                document.getElementById('course-password-input').focus();
+                return;
+            }
+
+            currentCourse = courseNum;
+            currentLevel = 1;
+            
+            let titleText = "Programación en Bloques: Primeros pasos";
+            if (currentCourse === 2) titleText = "Programación en Bloques: Laberintos";
+            else if (currentCourse === 3) titleText = "Programación en Bloques: Bucles Anidados";
+            
+            document.getElementById('app-current-title').innerText = titleText;
+
+            switchScreen('screen-game');
+            initProgressBar();
+            generateLevelMap();
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').style.display = 'none';
+            pendingCourseToUnlock = null;
+        }
+
+        function confirmCoursePassword() {
+            const pass = document.getElementById('course-password-input').value;
+            if (pass === "2846") {
+                const courseNum = pendingCourseToUnlock;
+                if (!unlockedCourses.includes(courseNum)) unlockedCourses.push(courseNum);
+                updateHomeUI();
+                closePasswordModal();
+                startCourse(courseNum);
+            } else {
+                alert("Clave incorrecta. Debes completar primero los cursos previos o solicitar la clave al profesor.");
+                document.getElementById('course-password-input').value = '';
+            }
+        }
+
+        function goBackToHome() {
+            if(isExecuting) return;
+            updateHomeUI();
+            switchScreen('screen-home');
+        }
+
+        function updateHomeUI() {
+            [2, 3].forEach(cNum => {
+                const card = document.getElementById(`card-course-${cNum}`);
+                const badge = document.getElementById(`badge-course-${cNum}`);
+                if (card && badge && unlockedCourses.includes(cNum)) {
+                    card.classList.remove('locked');
+                    card.classList.add('unlocked');
+                    badge.className = "course-badge b-unlocked";
+                    badge.innerText = "Habilitado";
+                }
+            });
+        }
+
+        function initProgressBar() {
+            const dotsContainer = document.getElementById('progress-dots');
+            dotsContainer.innerHTML = '';
+            for (let i = 1; i <= TOTAL_LEVELS; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot-level';
+                dot.id = `dot-level-${i}`;
+                dot.innerText = i;
+                dot.title = `Ir al Reto ${i}`;
+                dot.onclick = () => jumpToLevel(i);
+                dotsContainer.appendChild(dot);
+            }
+            updateProgressBarUI();
+        }
+
+        function jumpToLevel(lvlNum) {
+            if (isExecuting) return;
+            currentLevel = lvlNum;
+            generateLevelMap();
+            updateProgressBarUI();
+        }
+
+        function updateProgressBarUI() {
+            for (let i = 1; i <= TOTAL_LEVELS; i++) {
+                const dot = document.getElementById(`dot-level-${i}`);
+                if (!dot) continue;
+                dot.classList.remove('active', 'completed');
+                if (completedLevels[currentCourse].includes(i)) dot.classList.add('completed');
+                if (i === currentLevel) dot.classList.add('active');
+            }
+        }
+
+        function updateDuaHintDisplay() {
+            const hintBanner = document.getElementById('dua-hint-banner');
+            const hintText = document.getElementById('dua-hint-text');
+            
+            if (duaLevelHints[currentCourse] && duaLevelHints[currentCourse][currentLevel]) {
+                hintText.innerHTML = duaLevelHints[currentCourse][currentLevel];
+                hintBanner.style.display = 'block';
+            } else {
+                hintBanner.style.display = 'none';
+            }
+        }
+
+        function generateLevelMap() {
+            if (isExecuting) return;
+
+            if (currentCourse === 1) {
+                const startIdx = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE));
+                let targetIdx = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE));
+                while (targetIdx === startIdx) {
+                    targetIdx = Math.floor(Math.random() * (GRID_SIZE * GRID_SIZE));
+                }
+                startPos.x = startIdx % GRID_SIZE;
+                startPos.y = Math.floor(startIdx / GRID_SIZE);
+                targetPos.x = targetIdx % GRID_SIZE;
+                targetPos.y = Math.floor(targetIdx / GRID_SIZE);
+                bot.dir = 0;
+            } else {
+                const mapSet = currentCourse === 2 ? labyrinthMaps : nestedLoopMaps;
+                const mapData = mapSet[currentLevel];
+                startPos.x = mapData.start.x;
+                startPos.y = mapData.start.y;
+                targetPos.x = mapData.target.x;
+                targetPos.y = mapData.target.y;
+                bot.dir = mapData.start.dir;
+            }
+
+            workspaceItems = [];
+            renderWorkspace();
+            resetLevelState();
+            updateProgressBarUI();
+            updateDuaHintDisplay();
+            updateScoreUI();
+        }
+
+        function renderBoard() {
+            const gridContainer = document.getElementById('flat-grid');
+            gridContainer.innerHTML = '';
+
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${r}-${c}`;
+
+                    if (currentCourse > 1) {
+                        const mapSet = currentCourse === 2 ? labyrinthMaps : nestedLoopMaps;
+                        const terrain = mapSet[currentLevel].grid[r][c];
+                        if (terrain === 'M') cell.classList.add('wall-brown');
+                        else if (terrain === 'V') cell.classList.add('grass-green');
+
+                        if (currentCourse === 3 && mapSet[currentLevel].hints) {
+                            const hint = mapSet[currentLevel].hints.find(h => h.x === c && h.y === r);
+                            if (hint) {
+                                const arrowEl = document.createElement('span');
+                                arrowEl.className = 'cell-arrow-hint';
+                                arrowEl.innerText = hint.symbol;
+                                cell.appendChild(arrowEl);
+                            }
+                        }
+                    }
+
+                    if (c === startPos.x && r === startPos.y) cell.classList.add('start-cell');
+                    else if (c === targetPos.x && r === targetPos.y) cell.classList.add('target-cell');
+
+                    gridContainer.appendChild(cell);
+                }
+            }
+
+            const botEl = document.createElement('div');
+            botEl.className = 'bot';
+            botEl.id = 'bot';
+            botEl.innerHTML = tankSVG;
+            gridContainer.appendChild(botEl);
+            updateBotVisual();
+        }
+
+        function updateBotVisual() {
+            const botEl = document.getElementById('bot');
+            if (!botEl) return;
+            const targetCell = document.getElementById(`cell-${bot.y}-${bot.x}`);
+            if (targetCell) {
+                targetCell.appendChild(botEl);
+                botEl.style.transform = `rotate(${rotationDegrees[bot.dir]}deg)`;
+            }
+        }
+
+        function showCrashWarning(x, y) {
+            const cell = document.getElementById(`cell-${y}-${x}`);
+            if (cell) {
+                const warningEl = document.createElement('div');
+                warningEl.className = 'cell-crash-warning';
+                warningEl.innerText = '⚠️';
+                cell.appendChild(warningEl);
+
+                setTimeout(() => {
+                    if (warningEl.parentNode) {
+                        warningEl.parentNode.removeChild(warningEl);
+                    }
+                }, 700);
+            }
+        }
+
+        function dragFromToolbox(ev, blockType) {
+            if (isExecuting) { ev.preventDefault(); return; }
+            ev.dataTransfer.setData("text/plain", blockType);
+            ev.dataTransfer.setData("source", "toolbox");
+        }
+
+        function dragFromWorkspace(ev, pathStr) {
+            if (isExecuting) { ev.preventDefault(); return; }
+            ev.stopPropagation();
+            ev.dataTransfer.setData("source", "workspace");
+            ev.dataTransfer.setData("path", pathStr);
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+        function dragLeave(ev) { ev.currentTarget.classList.remove('drag-over'); }
+        function allowDropTrash(ev) { ev.preventDefault(); document.getElementById('toolbox-column').classList.add('trash-can-active'); }
+        function dragLeaveTrash(ev) { document.getElementById('toolbox-column').classList.remove('trash-can-active'); }
+
+        function dropToWorkspace(ev, zoneType, slotPathStr = '') {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            ev.stopPropagation(); 
+            if (isExecuting) return;
+
+            const source = ev.dataTransfer.getData("source");
+            const slotPath = parsePath(slotPathStr);
+            const targetList = getTargetListByPath(workspaceItems, slotPath);
+
+            if (source === "toolbox") {
+                const blockType = ev.dataTransfer.getData("text/plain");
+                if (!blockType) return;
+
+                if (blockType === 'loop') {
+                    targetList.push({ type: 'loop', iterations: 2, innerBlocks: [] });
+                } else {
+                    targetList.push({ type: 'single', action: blockType });
+                }
+            } else if (source === "workspace") {
+                const srcPath = parsePath(ev.dataTransfer.getData("path"));
+                if (!srcPath || srcPath.length === 0) return;
+
+                if (isDescendantPath(srcPath, slotPath)) return;
+
+                const movedItem = removeItemByPath(workspaceItems, srcPath);
+                if (movedItem) {
+                    targetList.push(movedItem);
+                }
+            }
+            renderWorkspace();
+        }
+
+        function dropTrash(ev) {
+            ev.preventDefault();
+            document.getElementById('toolbox-column').classList.remove('trash-can-active');
+            if (isExecuting) return;
+
+            const source = ev.dataTransfer.getData("source");
+            if (source === "workspace") {
+                const srcPath = parsePath(ev.dataTransfer.getData("path"));
+                if (srcPath && srcPath.length > 0) {
+                    removeItemByPath(workspaceItems, srcPath);
+                    renderWorkspace();
+                }
+            }
+        }
+
+        /* SOPORTE TÁCTIL PARA PANTALLAS DE CELULARES Y TABLETS */
+        let touchDragData = null;
+        let ghostEl = null;
+
+        function initTouchDragSupport() {
+            document.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
+
+        function handleTouchStart(e) {
+            if (isExecuting) return;
+            const block = e.target.closest('.block-element, .loop-container-block');
+            if (!block) return;
+
+            if (e.target.tagName === 'SELECT') return;
+
+            const isToolbox = !!block.closest('.toolbox-column');
+            const isWorkspace = !!block.closest('.workspace-column');
+
+            if (!isToolbox && !isWorkspace) return;
+
+            const touch = e.touches[0];
+            
+            let source = isToolbox ? 'toolbox' : 'workspace';
+            let blockType = block.getAttribute('data-type');
+            let pathStr = block.getAttribute('data-path');
+
+            if (isToolbox && !blockType) {
+                if (block.classList.contains('move')) blockType = 'avanzar';
+                else if (block.classList.contains('turn-left')) blockType = 'izquierda';
+                else if (block.classList.contains('turn-right')) blockType = 'derecha';
+                else if (block.classList.contains('loop-btn')) blockType = 'loop';
+            }
+
+            touchDragData = {
+                source: source,
+                blockType: blockType,
+                pathStr: pathStr,
+                startX: touch.clientX,
+                startY: touch.clientY,
+                blockEl: block
+            };
+
+            ghostEl = block.cloneNode(true);
+            ghostEl.classList.add('touch-drag-ghost');
+            ghostEl.style.width = block.offsetWidth + 'px';
+            ghostEl.style.left = (touch.clientX - block.offsetWidth / 2) + 'px';
+            ghostEl.style.top = (touch.clientY - block.offsetHeight / 2) + 'px';
+            document.body.appendChild(ghostEl);
+        }
+
+        function handleTouchMove(e) {
+            if (!touchDragData || !ghostEl) return;
+            e.preventDefault(); 
+            
+            const touch = e.touches[0];
+            ghostEl.style.left = (touch.clientX - ghostEl.offsetWidth / 2) + 'px';
+            ghostEl.style.top = (touch.clientY - ghostEl.offsetHeight / 2) + 'px';
+
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            document.querySelectorAll('.drag-over, .trash-can-active').forEach(el => {
+                el.classList.remove('drag-over', 'trash-can-active');
+            });
+
+            if (elementUnder) {
+                const targetSlot = elementUnder.closest('.loop-body-slots, .workspace-area');
+                if (targetSlot) {
+                    targetSlot.classList.add('drag-over');
+                }
+                const trashArea = elementUnder.closest('.toolbox-column');
+                if (trashArea && touchDragData.source === 'workspace') {
+                    trashArea.classList.add('trash-can-active');
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!touchDragData || !ghostEl) return;
+
+            const touch = e.changedTouches[0];
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            document.querySelectorAll('.drag-over, .trash-can-active').forEach(el => {
+                el.classList.remove('drag-over', 'trash-can-active');
+            });
+
+            if (elementUnder) {
+                const trashArea = elementUnder.closest('.toolbox-column');
+                const targetSlot = elementUnder.closest('.loop-body-slots, .workspace-area');
+
+                if (trashArea && touchDragData.source === 'workspace') {
+                    const srcPath = parsePath(touchDragData.pathStr);
+                    if (srcPath && srcPath.length > 0) {
+                        removeItemByPath(workspaceItems, srcPath);
+                        renderWorkspace();
+                    }
+                } else if (targetSlot) {
+                    let slotPathStr = '';
+                    if (targetSlot.classList.contains('loop-body-slots')) {
+                        const parentLoop = targetSlot.closest('.loop-container-block');
+                        if (parentLoop) {
+                            slotPathStr = parentLoop.getAttribute('data-path') || '';
+                        }
+                    }
+
+                    const slotPath = parsePath(slotPathStr);
+                    const targetList = getTargetListByPath(workspaceItems, slotPath);
+
+                    if (touchDragData.source === 'toolbox') {
+                        if (touchDragData.blockType === 'loop') {
+                            targetList.push({ type: 'loop', iterations: 2, innerBlocks: [] });
+                        } else if (touchDragData.blockType) {
+                            targetList.push({ type: 'single', action: touchDragData.blockType });
+                        }
+                    } else if (touchDragData.source === 'workspace') {
+                        const srcPath = parsePath(touchDragData.pathStr);
+                        if (srcPath && srcPath.length > 0 && !isDescendantPath(srcPath, slotPath)) {
+                            const movedItem = removeItemByPath(workspaceItems, srcPath);
+                            if (movedItem) {
+                                targetList.push(movedItem);
+                            }
+                        }
+                    }
+                    renderWorkspace();
+                }
+            }
+
+            if (ghostEl && ghostEl.parentNode) {
+                ghostEl.parentNode.removeChild(ghostEl);
+            }
+            ghostEl = null;
+            touchDragData = null;
+        }
+
+        function changeIterations(pathStr, val) {
+            const path = parsePath(pathStr);
+            const item = getItemByPath(workspaceItems, path);
+            if (item && item.type === 'loop') {
+                item.iterations = parseInt(val);
+            }
+        }
+
+        function countTotalBlocks(blocks = workspaceItems) {
+            let total = 0;
+            blocks.forEach(item => {
+                total++;
+                if (item.type === 'loop') {
+                    total += countTotalBlocks(item.innerBlocks);
+                }
+            });
+            return total;
+        }
+
+        function updateBlockCountDisplay() {
+            const titleEl = document.getElementById('workspace-title-count');
+            if (!titleEl) return;
+
+            if (currentCourse === 3) {
+                const total = countTotalBlocks(workspaceItems);
+                const limit = getLevelMaxBlocks();
+                titleEl.innerText = `Espacio de trabajo: ${total} / ${limit} bloques estimados`;
+                titleEl.style.color = (total > limit) ? '#fca5a5' : '#ffffff';
+            } else {
+                titleEl.innerText = `Espacio de trabajo`;
+                titleEl.style.color = '#ffffff';
+            }
+        }
+
+        function clearWorkspaceOnly() {
+            if (isExecuting) return;
+            workspaceItems = [];
+            renderWorkspace();
+            resetLevelState();
+        }
+
+        function renderBlockTree(container, blocks, parentPath = []) {
+            container.innerHTML = '';
+
+            blocks.forEach((item, index) => {
+                const currentPath = [...parentPath, index];
+                const pathStr = JSON.stringify(currentPath);
+                const elementId = `block-${currentPath.join('-')}`;
+
+                if (item.type === 'single') {
+                    const block = document.createElement('div');
+                    block.className = `block-element ${item.action === 'avanzar' ? 'move' : (item.action === 'derecha' ? 'turn-right' : 'turn-left')}`;
+                    block.id = elementId;
+                    block.setAttribute('draggable', 'true');
+                    block.setAttribute('data-path', pathStr);
+                    block.ondragstart = (e) => dragFromWorkspace(e, pathStr);
+                    
+                    if (item.action === 'avanzar') block.innerHTML = `<span>avanzar</span>${svgMove}`;
+                    else if (item.action === 'izquierda') block.innerHTML = `<span>girar a la izquierda</span>${svgTurnLeft}`;
+                    else block.innerHTML = `<span>girar a la derecha</span>${svgTurnRight}`;
+                    
+                    container.appendChild(block);
+                } else if (item.type === 'loop') {
+                    const loopContainer = document.createElement('div');
+                    loopContainer.className = 'loop-container-block';
+                    loopContainer.id = elementId;
+                    loopContainer.setAttribute('draggable', 'true');
+                    loopContainer.setAttribute('data-path', pathStr);
+                    loopContainer.ondragstart = (e) => dragFromWorkspace(e, pathStr);
+
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'loop-header';
+                    headerDiv.innerHTML = `<span>Repetir</span>`;
+
+                    const select = document.createElement('select');
+                    select.onclick = (e) => e.stopPropagation(); 
+                    select.onchange = (e) => changeIterations(pathStr, e.target.value);
+                    for(let v = 2; v <= 9; v++) {
+                        const opt = document.createElement('option');
+                        opt.value = v; opt.innerText = `${v} veces`;
+                        if(item.iterations === v) opt.selected = true;
+                        select.appendChild(opt);
+                    }
+                    headerDiv.appendChild(select);
+                    loopContainer.appendChild(headerDiv);
+
+                    const bodySlots = document.createElement('div');
+                    bodySlots.className = 'loop-body-slots';
+                    bodySlots.setAttribute('ondragover', 'allowDrop(event)');
+                    bodySlots.setAttribute('ondragleave', 'dragLeave(event)');
+                    bodySlots.ondrop = (e) => dropToWorkspace(e, 'loop', pathStr);
+                    
+                    renderBlockTree(bodySlots, item.innerBlocks, currentPath);
+
+                    loopContainer.appendChild(bodySlots);
+                    container.appendChild(loopContainer);
+                }
+            });
+        }
+
+        function renderWorkspace() {
+            const stackContainer = document.getElementById('blocks-stack');
+            renderBlockTree(stackContainer, workspaceItems, []);
+            updateBlockCountDisplay();
+        }
+
+        function resetLevelState() {
+            isExecuting = false;
+            executionInterrupted = false;
+            reachedTarget = false;
+
+            if (currentCourse === 1) {
+                bot.x = startPos.x; bot.y = startPos.y; bot.dir = 0;
+            } else {
+                const mapSet = currentCourse === 2 ? labyrinthMaps : nestedLoopMaps;
+                const mapData = mapSet[currentLevel];
+                bot.x = mapData.start.x; bot.y = mapData.start.y; bot.dir = mapData.start.dir;
+            }
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('victory'));
+            document.querySelectorAll('.block-element, .loop-container-block').forEach(b => b.classList.remove('executing'));
+            renderBoard();
+        }
+
+        function triggerDuaError() {
+            isExecuting = false;
+            document.querySelectorAll('.executing').forEach(el => el.classList.remove('executing'));
+            
+            const randomIndex = Math.floor(Math.random() * motivationalErrorMessages.length);
+            const selectedErrorMsg = motivationalErrorMessages[randomIndex];
+            
+            document.getElementById('dua-error-message').innerText = selectedErrorMsg;
+            document.getElementById('dua-error-modal').style.display = 'flex';
+        }
+
+        function closeDuaModal() {
+            document.getElementById('dua-error-modal').style.display = 'none';
+            resetLevelState();
+        }
+
+        function triggerDuaSuccess() {
+            isExecuting = false;
+            
+            // REGISTRAR EL NIVEL COMO COMPLETADO
+            if (!completedLevels[currentCourse].includes(currentLevel)) {
+                completedLevels[currentCourse].push(currentLevel);
+            }
+
+            const titleEl = document.getElementById('dua-success-title');
+            const textEl = document.getElementById('dua-success-message');
+            const randomIndex = Math.floor(Math.random() * motivationalSuccessMessages.length);
+            const selectedMsg = motivationalSuccessMessages[randomIndex];
+
+            if (currentCourse === 3) {
+                const totalBlocks = countTotalBlocks(workspaceItems);
+                const maxLimit = getLevelMaxBlocks();
+
+                if (totalBlocks > maxLimit) {
+                    levelScores[currentLevel] = 7;
+                    if (titleEl) titleEl.innerText = "⚡ Reto Completado";
+                    if (textEl) {
+                        textEl.innerHTML = `<b>¡Buen trabajo! Sin embargo, puedes mejorar, ya que este reto puede resolverse con menos bloques.</b><br><br>` +
+                            `<span style="font-size:14px; color:#64748b;">Usaste <b>${totalBlocks}</b> bloques (límite recomendado: <b>${maxLimit}</b>).<br>` +
+                            `Puntuación de este intento: <b>+7 puntos</b>. ¡Reinténtalo para ganar +10 pts!</span>`;
+                    }
+                } else {
+                    levelScores[currentLevel] = 10;
+                    if (titleEl) titleEl.innerText = "✨ ¡Nivel Superado con Éxito! ✨";
+                    if (textEl) {
+                        textEl.innerHTML = `<b>${selectedMsg}</b><br><br>` +
+                            `<span style="font-size:14px; color:#15803d;">¡Excelente eficiencia! Usaste <b>${totalBlocks}</b> de <b>${maxLimit}</b> bloques estimados.<br>` +
+                            `Puntuación obtenida: <b>+10 puntos</b> 🏆</span>`;
+                    }
+                }
+            } else {
+                if (titleEl) titleEl.innerText = "✨ ¡Nivel Superado! ✨";
+                if (textEl) textEl.innerHTML = `<b>${selectedMsg}</b>`;
+            }
+
+            updateScoreUI();
+            document.getElementById('dua-success-modal').style.display = 'flex';
+        }
+
+        function retryCurrentLevel() {
+            document.getElementById('dua-success-modal').style.display = 'none';
+            resetLevelState();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('dua-success-modal').style.display = 'none';
+            advanceLevel();
+        }
+
+        async function executeBlockList(blocks, parentPath = []) {
+            for (let i = 0; i < blocks.length; i++) {
+                if (!isExecuting || executionInterrupted || reachedTarget) break;
+
+                const currentPath = [...parentPath, i];
+                const elementId = `block-${currentPath.join('-')}`;
+                const uiElement = document.getElementById(elementId);
+                const item = blocks[i];
+
+                if (item.type === 'single') {
+                    if (uiElement) uiElement.classList.add('executing');
+                    
+                    let validMove = executeStep(item.action);
+                    if (!validMove) {
+                        executionInterrupted = true;
+                        triggerDuaError();
+                        return;
+                    }
+                    
+                    if (checkVictory()) {
+                        reachedTarget = true;
+                        if (uiElement) uiElement.classList.remove('executing');
+                        return;
+                    }
+
+                    await new Promise(resolve => setTimeout(resolve, 450));
+                    if (uiElement) uiElement.classList.remove('executing');
+                } else if (item.type === 'loop') {
+                    if (uiElement) uiElement.classList.add('executing');
+
+                    for (let iter = 0; iter < item.iterations; iter++) {
+                        if (!isExecuting || executionInterrupted || reachedTarget) break;
+
+                        await executeBlockList(item.innerBlocks, currentPath);
+
+                        if (reachedTarget || executionInterrupted) break;
+                    }
+
+                    if (uiElement) uiElement.classList.remove('executing');
+                    if (reachedTarget || executionInterrupted) break;
+                }
+            }
+        }
+
+        async function runProgram() {
+            if (isExecuting || workspaceItems.length === 0) return;
+            resetLevelState();
+            isExecuting = true;
+            reachedTarget = false;
+            executionInterrupted = false;
+
+            await executeBlockList(workspaceItems, []);
+
+            isExecuting = false;
+            document.querySelectorAll('.executing').forEach(el => el.classList.remove('executing'));
+
+            if (reachedTarget) {
+                setTimeout(() => { triggerDuaSuccess(); }, 100);
+            } else if (!executionInterrupted) {
+                setTimeout(() => { triggerDuaError(); }, 100);
+            }
+        }
+
+        function executeStep(command) {
+            if (command === 'avanzar') {
+                const vec = dirVectors[bot.dir];
+                const nextX = bot.x + vec.dx;
+                const nextY = bot.y + vec.dy;
+                
+                // Colisión con bordes del mapa
+                if (nextX < 0 || nextX >= GRID_SIZE || nextY < 0 || nextY >= GRID_SIZE) {
+                    showCrashWarning(bot.x, bot.y);
+                    return false;
+                }
+                
+                // Colisión con obstáculos (Curso 2 y 3)
+                if (currentCourse > 1) {
+                    const mapSet = currentCourse === 2 ? labyrinthMaps : nestedLoopMaps;
+                    const terrain = mapSet[currentLevel].grid[nextY][nextX];
+                    if (terrain === 'M' || terrain === 'V') {
+                        showCrashWarning(nextX, nextY);
+                        return false; 
+                    }
+                }
+                
+                bot.x = nextX;
+                bot.y = nextY;
+            } else if (command === 'derecha') {
+                bot.dir = (bot.dir + 1) % 4;
+            } else if (command === 'izquierda') {
+                bot.dir = (bot.dir + 3) % 4;
+            }
+            updateBotVisual();
+            return true;
+        }
+
+        function checkVictory() {
+            if (bot.x === targetPos.x && bot.y === targetPos.y) {
+                const targetCell = document.getElementById('cell-' + targetPos.y + '-' + targetPos.x);
+                if (targetCell) targetCell.classList.add('victory');
+                return true;
+            }
+            return false;
+        }
+
+        function advanceLevel() {
+            // VERIFICAR SI YA COMPLETÓ TODOS LOS 12 NIVELES DEL CURSO ACTUAL
+            const totalCompleted = completedLevels[currentCourse].length;
+
+            if (totalCompleted === TOTAL_LEVELS) {
+                // OBTENER CERTIFICADO SOLO SI SUPERÓ LOS 12 NIVELES
+                document.getElementById('student-name').value = '';
+                switchScreen('screen-certificate');
+                drawCertificate();
+            } else if (currentLevel < TOTAL_LEVELS) {
+                currentLevel++;
+                generateLevelMap();
+            } else {
+                // SI ESTÁ EN EL NIVEL 12 PERO HIZO SALTOS Y NO HA COMPLETADO LOS 12 NIVELES
+                const missingCount = TOTAL_LEVELS - totalCompleted;
+                alert(`⚠️ Para obtener tu certificado debes completar todos los 12 niveles. Aún te faltan ${missingCount} nivel(es) por superar.`);
+                
+                // Buscar el primer nivel que no haya completado para enviarlo allí
+                for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+                    if (!completedLevels[currentCourse].includes(lvl)) {
+                        currentLevel = lvl;
+                        break;
+                    }
+                }
+                generateLevelMap();
+            }
+        }
+
+        function drawCertificate() {
+            const canvas = document.getElementById('cert-canvas');
+            const ctx = canvas.getContext('2d');
+            const name = document.getElementById('student-name').value || "[Tu Nombre Aquí]";
+            
+            let courseTitle = "Curso 1: Primeros pasos";
+            if (currentCourse === 2) courseTitle = "Curso 2: Laberintos";
+            else if (currentCourse === 3) courseTitle = "Curso 3: Bucles Anidados";
+
+            ctx.fillStyle = "#fff8f0"; ctx.fillRect(0, 0, 650, 450);
+            ctx.lineWidth = 15; ctx.strokeStyle = "#00b4c6"; ctx.strokeRect(0, 0, 650, 450);
+            ctx.lineWidth = 4; ctx.strokeStyle = "#ffa400"; ctx.strokeRect(18, 18, 614, 414);
+
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#333e48"; ctx.font = "bold 24px 'Segoe UI'";
+            ctx.fillText("CERTIFICADO DE LOGRO", 325, 75);
+            
+            ctx.fillStyle = "#ff00a0"; ctx.font = "italic 15px 'Segoe UI'";
+            ctx.fillText("Otorgado con orgullo a:", 325, 125);
+
+            ctx.fillStyle = "#000000"; ctx.font = "bold 30px Georgia";
+            ctx.fillText(name, 325, 175);
+
+            ctx.fillStyle = "#475569"; ctx.font = "14px 'Segoe UI'";
+            ctx.fillText("Por haber completado exitosamente los 12 niveles del módulo:", 325, 230);
+
+            ctx.fillStyle = "#00b4c6"; ctx.font = "bold 19px 'Segoe UI'";
+            ctx.fillText(courseTitle, 325, 265);
+
+            // SOLO SE MUESTRA LA PUNTUACIÓN ACUMULADA AL FINALIZAR EL CURSO DE BUCLES ANIDADOS
+            if (currentCourse === 3) {
+                const finalScore = calculateTotalScore();
+                ctx.fillStyle = "#854d0e"; ctx.font = "bold 16px 'Segoe UI'";
+                ctx.fillText(`Puntuación Final Acumulada: ${finalScore} / 120 pts`, 325, 310);
+            }
+
+            ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(220, 380); ctx.lineTo(430, 380); ctx.stroke();
+            ctx.fillStyle = "#64748b"; ctx.font = "italic 12px 'Segoe UI'";
+            ctx.fillText("Instructor: Pedro Javier Fuentes Parada", 325, 400);
+        }
+
+        function downloadCertificate() {
+            const name = document.getElementById('student-name').value.trim();
+            if(!name) { alert("Por favor escribe tu nombre completo para generar el archivo."); return; }
+            
+            const canvas = document.getElementById('cert-canvas');
+            const link = document.createElement('a');
+            link.download = `Certificado_Curso_${currentCourse}_${name.replace(/ /g, '_')}.png`;
+            link.href = canvas.toDataURL ? canvas.toDataURL() : canvas.toDataURL();
+            link.click();
+        }
+
+        function acceptCertificateAndContinue() {
+            const name = document.getElementById('student-name').value.trim();
+            if(!name) { alert("Escribe tu nombre antes de continuar para guardar tu registro."); return; }
+
+            if (currentCourse < 3) {
+                const nextCourseNum = currentCourse + 1;
+                if(!unlockedCourses.includes(nextCourseNum)) unlockedCourses.push(nextCourseNum);
+                
+                const nextCourseName = nextCourseNum === 2 ? "Curso 2: Laberintos" : "Curso 3: Bucles Anidados";
+                alert(`¡Felicidades! Se ha desbloqueado el ${nextCourseName}.`);
+                
+                currentCourse = nextCourseNum;
+                currentLevel = 1;
+                document.getElementById('app-current-title').innerText = `Programación en Bloques: ${nextCourseName.split(': ')[1]}`;
+                switchScreen('screen-game');
+                initProgressBar();
+                generateLevelMap();
+            } else {
+                alert("¡Increíble! Has finalizado todos los cursos de la plataforma. ¡Eres un auténtico maestro de la programación!");
+                currentCourse = 1;
+                currentLevel = 1;
+                updateHomeUI();
+                switchScreen('screen-home');
+            }
+        }
+
+        // Inicializar listeners táctiles y estado de portada
+        window.addEventListener('load', () => {
+            initTouchDragSupport();
+            updateHomeUI();
+        });
+    </script>
 </body>
 </html>
