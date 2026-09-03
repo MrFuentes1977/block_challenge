@@ -209,29 +209,29 @@ const nestedLoopMaps = {
 ['M','M','M','M','M','M','M','M'],
 ['M','C','C','C','C','C','M','M'],
 ['M','M','M','M','M','C','M','M'],
-['M','M','C','C','C','C','M','M'],
-['M','M','C','M','M','M','M','M'],
-['M','M','C','C','C','C','M','M'],
+['M','C','C','C','C','C','M','M'],
+['M','C','M','M','M','M','M','M'],
+['M','C','C','C','C','C','M','M'],
 ['M','M','M','M','M','M','M','M'],
 ['M','M','M','M','M','M','M','M']] },
-    5: { start: {x: 0, y: 0, dir: 0}, target: {x: 3, y: 3}, grid: [
-['C','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','C','C','C','C','M','C','M'],
-['M','C','M','C','C','M','C','M'],
-['M','C','M','M','M','M','C','M'],
-['M','C','C','C','C','C','C','M'],
+    5: { start: {x: 0, y: 0, dir: 0}, target: {x: 2, y: 2}, grid: [
+['C','C','C','C','C','C','C','C'],
+['M','M','M','M','M','M','M','C'],
+['M','M','C','M','M','M','M','C'],
+['M','M','C','M','M','M','M','C'],
+['M','M','C','M','M','M','M','C'],
+['M','M','C','M','M','M','M','C'],
+['M','M','C','M','M','M','M','C'],
+['M','M','C','C','C','C','C','C']] },
+    6: { start: {x: 0, y: 7, dir: 0}, target: {x: 6, y: 1}, grid: [
 ['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M']] },
-    6: { start: {x: 0, y: 7, dir: 0}, target: {x: 7, y: 0}, grid: [
-['M','M','M','M','M','M','C','C'],
 ['M','M','M','M','C','C','C','M'],
 ['M','M','M','M','C','M','M','M'],
 ['M','M','C','C','C','M','M','M'],
 ['M','M','C','M','M','M','M','M'],
 ['C','C','C','M','M','M','M','M'],
 ['C','M','M','M','M','M','M','M'],
-['C','C','M','M','M','M','M','M']] },
+['C','M','M','M','M','M','M','M']] },
     7: { start: {x: 7, y: 7, dir: 2}, target: {x: 0, y: 0}, grid: [
 ['C','C','M','M','M','M','M','M'],
 ['M','C','C','M','M','M','M','M'],
@@ -241,51 +241,51 @@ const nestedLoopMaps = {
 ['M','M','M','M','M','C','C','M'],
 ['M','M','M','M','M','M','C','C'],
 ['M','M','M','M','M','M','M','C']] },
-    8: { start: {x: 1, y: 0, dir: 1}, target: {x: 6, y: 7}, grid: [
-['M','C','M','M','M','M','M','M'],
-['M','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','C','C','C','C','C','C','M'],
-['M','C','M','M','M','M','M','M'],
-['M','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','M','M','M','M','M','C','M']] },
-    9: { start: {x: 0, y: 0, dir: 0}, target: {x: 4, y: 4}, grid: [
+    8: { start: {x: 0, y: 0, dir: 1}, target: {x: 6, y: 6}, grid: [
+['C','M','M','M','M','M','M','M'],
+['C','M','M','M','M','M','M','M'],
+['C','M','M','M','M','M','M','M'],
+['C','C','C','C','M','M','M','M'],
+['M','M','M','C','M','M','M','M'],
+['M','M','M','C','M','M','M','M'],
+['M','M','M','C','C','C','C','M'],
+['M','M','M','M','M','M','M','M']] },
+    9: { start: {x: 0, y: 0, dir: 0}, target: {x: 0, y: 6}, grid: [
 ['C','C','C','C','C','C','C','C'],
 ['M','M','M','M','M','M','M','C'],
-['C','C','C','C','C','C','M','C'],
-['C','M','M','M','M','C','M','C'],
-['C','M','C','C','C','C','M','C'],
-['C','M','M','M','M','M','M','C'],
 ['C','C','C','C','C','C','C','C'],
-['M','M','M','M','M','M','M','M']] },
-    10: { start: {x: 0, y: 3, dir: 0}, target: {x: 7, y: 3}, grid: [
-['M','M','M','M','M','M','M','M'],
-['M','C','C','C','C','C','C','M'],
-['M','C','M','M','M','M','C','M'],
-['C','C','M','C','C','M','C','C'],
-['M','C','M','M','M','M','C','M'],
-['M','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','M','M'],
-['M','M','M','M','M','M','M','M']] },
-    11: { start: {x: 7, y: 0, dir: 2}, target: {x: 0, y: 7}, grid: [
+['C','M','M','M','M','M','M','M'],
+['C','C','C','C','C','C','C','C'],
 ['M','M','M','M','M','M','M','C'],
-['M','C','C','C','C','C','C','C'],
-['M','C','M','M','M','M','M','M'],
-['M','C','C','C','C','C','C','M'],
-['M','M','M','M','M','M','C','M'],
-['M','C','C','C','C','C','C','M'],
-['M','C','M','M','M','M','M','M'],
-['C','C','M','M','M','M','M','M']] },
-    12: { start: {x: 0, y: 7, dir: 0}, target: {x: 7, y: 7}, grid: [
-['M','M','M','M','M','M','M','M'],
 ['C','C','C','C','C','C','C','C'],
-['C','M','M','M','M','M','M','C'],
-['C','M','C','C','C','C','M','C'],
-['C','M','C','M','M','C','M','C'],
-['C','M','C','C','C','C','M','C'],
-['C','M','M','M','M','M','M','C'],
-['C','C','C','C','C','C','C','C']] }
+['M','M','M','M','M','M','M','M']] },
+    10: { start: {x: 0, y: 3, dir: 3}, target: {x: 7, y: 3}, grid: [
+['M','M','M','M','M','M','M','M'],
+['C','C','C','M','C','C','C','M'],
+['C','M','C','M','C','M','C','M'],
+['C','M','C','C','C','M','C','C'],
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M']] },
+    11: { start: {x: 0, y: 3, dir: 1}, target: {x: 7, y: 3}, grid: [
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M'],
+['C','M','C','C','C','M','C','C'],
+['C','M','C','M','C','M','C','M'],
+['C','C','C','M','C','C','C','M'],
+['M','M','M','M','M','M','M','M'],
+['M','M','M','M','M','M','M','M']] },
+    12: { start: {x: 7, y: 7, dir: 3}, target: {x: 0, y: 7}, grid: [
+['M','C','C','C','M','C','C','C'],
+['M','C','M','C','M','C','M','C'],
+['M','C','M','C','M','C','M','C'],
+['M','C','M','C','M','C','M','C'],
+['M','C','M','C','M','C','M','C'],
+['M','C','M','C','M','C','M','C'],
+['M','C','M','C','M','C','M','C'],
+['C','C','M','C','C','C','M','C']] }
 };
 
 const motivationalSuccessMessages = [
@@ -620,6 +620,7 @@ function dropTrash(ev) {
     }
 }
 
+/* SOPORTE TÁCTIL EXCLUSIVO PARA MANIPULACIÓN EN CELULARES Y TABLETS */
 let touchDragData = null;
 let ghostEl = null;
 
@@ -905,7 +906,7 @@ function triggerDuaSuccess() {
         if (titleEl) titleEl.innerText = "⚡ Reto Completado";
         if (textEl) {
             textEl.innerHTML = `<b>¡Buen trabajo! Sin embargo, puedes mejorar, ya que este reto puede resolverse con menos bloques.</b><br><br>` +
-                `<span style="font-size:13px; color:#64748b;">Usaste <b>${totalBlocks}</b> bloques (límite recomendado: <b>${maxLimit}</b>).<br>` +
+                `<span style="font-size:14px; color:#64748b;">Usaste <b>${totalBlocks}</b> bloques (límite recomendado: <b>${maxLimit}</b>).<br>` +
                 `Puntuación de este intento: <b>+7 puntos</b>. ¡Reinténtalo para ganar +10 pts!</span>`;
         }
     } else {
@@ -915,7 +916,7 @@ function triggerDuaSuccess() {
         const selectedMsg = motivationalSuccessMessages[randomIndex];
         if (textEl) {
             textEl.innerHTML = `<b>${selectedMsg}</b><br><br>` +
-                `<span style="font-size:13px; color:#15803d;">¡Excelente eficiencia! Usaste <b>${totalBlocks}</b> de <b>${maxLimit}</b> bloques estimados.<br>` +
+                `<span style="font-size:14px; color:#15803d;">¡Excelente eficiencia! Usaste <b>${totalBlocks}</b> de <b>${maxLimit}</b> bloques estimados.<br>` +
                 `Puntuación obtenida: <b>+10 puntos</b> 🏆</span>`;
         }
     }
@@ -1117,7 +1118,7 @@ function acceptCertificateAndContinue() {
     }
 }
 
-// Evento de inicialización cuando el documento está completamente cargado
+// Inicialización de soporte táctil y estado inicial
 window.addEventListener('load', () => {
     initTouchDragSupport();
     updateHomeUI();
